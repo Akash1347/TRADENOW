@@ -1,0 +1,100 @@
+*{
+     
+    margin: 0;
+    padding: 0;
+ }
+
+.accordion-button {
+    background-color: #fff !important;
+    color: #000000bd;
+    margin-top: 1rem;
+}
+
+ 
+.accordion-button:not(.collapsed) {
+    background-color: #f4f4f48a !important;
+     
+    box-shadow: none !important;
+    animation-timeline: 200ms ease-in-out;
+}
+
+ 
+.accordion-button:focus {
+    box-shadow: none !important;
+}
+
+ 
+.accordion-collapse {
+    transition: height 0.4s ease !important;   
+}
+
+.accordion-button {
+    transition: background-color 0.3s ease, color 0.3s ease !important;
+    transition: transform 0.3s ease !important; 
+    
+}
+.accordion-flush{
+    width: 65% !important;
+    margin: 1rem;
+    padding: 1rem;
+     
+}
+.accordion-button:hover {
+    transform: scale(1.05) !important;
+    cursor: pointer;
+}
+li{
+    color: #397dd0;
+    font-weight: 500;
+    padding: 1rem;
+     
+
+}
+li:hover{
+    color: #000000ac !important;
+    cursor: pointer;
+}
+button{
+    font-size: large !important;
+    font-weight: 600;
+    
+
+
+}
+
+i{
+    margin-right: 1rem ;
+    color:  #397dd0 ;
+    
+}
+
+.quick-links{
+    color: black;
+
+}
+.quick-links ol{
+    margin: 0;
+    padding: 10px;
+    color: #397dd0;
+}
+
+ .quick-link-heading{
+    background-color: rgba(0, 0, 0, 0.037);
+    height: 45px;
+    padding: 8px;
+ }
+
+ .random-box{
+    background-color: rgba(255, 116, 23, 0.911);
+    padding: 0;
+    margin: 0;
+ }
+ .box{
+    padding: 0;
+    width: 296px;
+ }
+
+ .inside-random-box{
+    background-color: rgb(252, 240, 233);
+    font-weight: 600;
+ }
