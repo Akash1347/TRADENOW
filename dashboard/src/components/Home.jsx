@@ -1,11 +1,14 @@
 import Dashboard from "./Dashboard";
 import TopBar from "./TopBar";
+import { UserContextProvider } from "./userContext";
 
 function Home() {
     return(
        <>
-         <TopBar/>
-        <Dashboard/>
+        <UserContextProvider>
+          <TopBar/>
+          <Dashboard/>
+        </UserContextProvider>
        
        </>
 

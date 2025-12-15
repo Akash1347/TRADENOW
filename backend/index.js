@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+console.log("NODE_ENV:", process.env.NODE_ENV);
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -13,9 +13,20 @@ const PORT = process.env.port || 3001;
 const url = process.env.MONGO_URL;
 const app = express();
 
-app.use(bodyParser.json());
-app.use(cors());
+
+
+const authRoute = require("./routes/AuthRoutes");
+const cookieParser = require("cookie-parser");
+
 app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(cors({
+    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+    credentials: true
+}));
+
 mongoose.connect(url)
     .then(()=> console.log("DB connected"))
     .catch((err) => console.log(err));
@@ -53,7 +64,9 @@ app.post('/addorder', async(req, res) => {
    
 });
 
+app.use('/api/auth' ,authRoute);
+
 
 app.listen(PORT ,()=>{
-    console.log("App started");
+    console.log(`App started at ${PORT}`);
 });

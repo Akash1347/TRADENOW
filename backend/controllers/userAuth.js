@@ -1,0 +1,339 @@
+const User = require("../model/UsersModel");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/sendEmail")
+
+
+module.exports.signin = async (req, res) => {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+        return res.json({ success: false, message: "Invalid Details" });
+    }
+
+    try {
+        const exist = await User.findOne({ email });
+        if (exist) {
+            return res.json({ success: false, message: "User Already Exist" });
+        }
+
+        const hashPassword = await bcrypt.hash(password, 10);
+
+        const data = await User.create({
+            username,
+            email,
+            password: hashPassword
+        });
+
+        const token = jwt.sign(
+            { id: data._id },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" }
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+        await sendEmail(
+            data.email,
+            "Welcome to TRADENOW",
+            `Hi ${data.username},
+
+                Your TRADENOW account has been created successfully.
+
+                You can now log in and start using the platform.
+
+                If this wasn’t you, please ignore this email.
+
+                — Team TRADENOW`
+        );
+        return res.json({ success: true, message: "Sign in successfully" });
+
+    } catch (err) {
+        return res.json({ success: false, message: err.message });
+    }
+};
+
+
+module.exports.login = async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.json({ success: false, message: "Fill All Details" });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.json({ success: false, message: "Invalid Details" });
+        }
+
+        const isCorrectPassword = await bcrypt.compare(password, user.password);
+        if (!isCorrectPassword) {
+            return res.json({ success: false, message: "Invalid Details" });
+        }
+
+        const token = jwt.sign(
+            { id: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" }
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+
+        return res.json({ success: true, message: "Logged in successfully" });
+
+    } catch (err) {
+        return res.json({ success: false, message: err.message });
+    }
+};
+
+module.exports.logout = (req, res) => {
+    try {
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
+        })
+        return res.json({ success: true, message: "Logged Out" })
+    } catch (err) {
+        return res.json({ success: false, message: err.message });
+
+    }
+};
+
+
+module.exports.sendVerificationCode = async (req, res) => {
+    const userId = req.userId;
+
+    if (!userId) {
+        return res.json({ success: false, message: "Unauthorized — user not found" });
+    }
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.json({ success: false, message: "Wrong Details" });
+        }
+
+        const otp = String(100000 + Math.floor(Math.random() * 900000));
+        const otpExpireAt = Date.now() + 1000 * 60 * 5;
+
+        const updatedInfo = await User.findByIdAndUpdate(
+            userId,
+            {
+                verifyOtp: otp,
+                verifyOtpExpireAt: otpExpireAt
+            },
+            { new: true }
+        );
+
+        console.log(updatedInfo);
+        await sendEmail(
+            updatedInfo.email,
+            "Account Verification OTP",
+            `Hi ${updatedInfo.username},
+
+            Your One-Time Password (OTP) for verifying your TRADENOW account is:
+
+            ${otp}
+
+            This OTP is valid for 5 minutes.
+
+            — Team TRADENOW`
+        );
+
+        return res.json({ success: true, message: "OTP sent successfully" });
+
+    } catch (err) {
+        return res.json({ success: false, message: err.message });
+    }
+};
+
+
+module.exports.verifyAccount = async (req, res) => {
+    const { otp } = req.body;
+    const userId = req.userId;
+
+    if (!userId || !otp) {
+        return res.json({ success: false, message: "Wrong Details" });
+    }
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.json({ success: false, message: "User Not Found" });
+        }
+
+        if (user.verifyOtp === "" || user.verifyOtp !== otp) {
+            return res.json({ success: false, message: "Invalid OTP" });
+        }
+
+        if (user.verifyOtpExpireAt < Date.now()) {
+            return res.json({ success: false, message: "OTP Expired" });
+        }
+
+        const updatedInfo = await User.findByIdAndUpdate(
+            userId,
+            {
+                isAccountVerified: true,
+                verifyOtp: "",
+                verifyOtpExpireAt: 0
+            },
+            { new: true }
+        );
+
+        console.log(updatedInfo);
+
+        return res.json({ success: true, message: "Email Verified Successfully" });
+
+    } catch (err) {
+        return res.json({ success: false, message: err.message });
+    }
+};
+
+
+module.exports.forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    console.log(email);
+
+    if (!email) {
+        return res.json({ success: false, message: "Invalid Details" });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.json({ success: false, message: "Invalid Details" });
+        }
+
+        const otp = String(Math.floor(100000 + Math.random() * 900000));
+        const expireTime = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+        const updatedUser = await User.findOneAndUpdate(
+            { email },
+            {
+                resetOtp: otp,
+                resetOtpExpireAt: expireTime
+            },
+            { new: true }
+        );
+
+        console.log(updatedUser);
+
+        await sendEmail(
+            email,
+            "Password Reset OTP",
+            `Hi,
+
+            We received a request to reset the password for your TRADENOW account.
+
+            Your One-Time Password (OTP) is:
+            ${otp}
+
+            This OTP is valid for 5 minutes.
+ 
+            — Team TRADENOW`
+        );
+
+
+        return res.json({ success: true, message: "OTP sent to your email" });
+
+    } catch (err) {
+        return res.json({ success: false, message: err.message });
+    }
+};
+
+
+module.exports.resetPassword = async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+    console.log(req.body);
+
+    if (!email || !otp || !newPassword) {
+        return res.json({ success: false, message: "Fill All Details" });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.json({ success: false, message: "Invalid Details" });
+        }
+
+        if (!user.resetOtp || user.resetOtp !== otp) {
+            return res.json({ success: false, message: "Invalid OTP" });
+        }
+
+        if (user.resetOtpExpireAt < Date.now()) {
+            return res.json({ success: false, message: "OTP is NOT valid" });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        const updatedUser = await User.findOneAndUpdate(
+            { email },
+            {
+                password: hashedPassword,
+                resetOtp: "",
+                resetOtpExpireAt: 0
+            },
+            { new: true }
+        );
+
+        console.log(updatedUser);
+
+        return res.json({ success: true, message: "Password has been updated" });
+
+    } catch (err) {
+        return res.json({ success: false, message: err.message });
+    }
+};
+
+
+module.exports.isAuthenticated = async (req, res) => {
+    try {
+        return res.json({ success: true, message: "User Authenticated" });
+    } catch (err) {
+        return res.json({ success: false, message: err.message });
+
+    }
+}
+
+
+module.exports.getUserData = async (req, res) => {
+    const userId = req.userId;
+
+    if (!userId) {
+        return res.json({ success: false, message: "Not authorized" });
+    }
+
+    try {
+        const user = await User.findById(userId).select(
+            "username email isAccountVerified"
+        );
+
+        if (!user) {
+            return res.json({ success: false, message: "User not found" });
+        }
+
+        return res.json({
+            success: true,
+            userData: {
+                username: user.username,
+                email: user.email,
+                isVerified: user.isAccountVerified,
+            },
+        });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};

@@ -9,14 +9,19 @@ import Funds from './components/Funds.jsx'
 import Holdings from './components/Holdings.jsx'
 import Positions from './components/Positions.jsx'
 import NotFound from './components/NotFound.jsx'
+import VerifyAccount from "./components/verifyAccount.jsx";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
+    <ToastContainer />
     <BrowserRouter>
       <Routes>
         <Route path="/*" element={<Home />} />
+        
         {/* <Route path="/apps" element={<Apps />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/funds" element={<Funds />} />

@@ -6,9 +6,40 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import GeneralContext from "./GeneralContext";
+import { DoughnutChart } from "./DoughnoutChart";
 
+const labels = watchlist.map((subArray) => subArray["name"]);
 
 function WatchList(){
+  const data = {
+  labels,
+  datasets: [
+    {
+      label: "Price",
+      data: watchlist.map((stock) => stock.price),
+      backgroundColor: [
+        "rgba(46, 204, 113, 0.75)",  // green
+        "rgba(52, 152, 219, 0.75)",  // blue
+        "rgba(241, 196, 15, 0.75)",  // yellow
+        "rgba(231, 76, 60, 0.75)",   // red
+        "rgba(155, 89, 182, 0.75)",  // purple
+        "rgba(26, 188, 156, 0.75)",  // teal
+      ],
+      borderColor: [
+        "rgba(46, 204, 113, 1)",
+        "rgba(52, 152, 219, 1)",
+        "rgba(241, 196, 15, 1)",
+        "rgba(231, 76, 60, 1)",
+        "rgba(155, 89, 182, 1)",
+        "rgba(26, 188, 156, 1)",
+      ],
+      borderWidth: 2,
+      hoverOffset: 12,
+    },
+  ],
+};
+
+
   return (
     <div className="watchlist-container">
       <div className="search-container">
@@ -35,6 +66,7 @@ function WatchList(){
         }
 
       </ul>
+      <DoughnutChart data={data} />
     </div>
   );
 };
