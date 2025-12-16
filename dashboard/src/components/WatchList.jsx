@@ -7,6 +7,7 @@ import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import GeneralContext from "./GeneralContext";
 import { DoughnutChart } from "./DoughnoutChart";
+import StockPriceChart from "./StockPriceChart";
 
 const labels = watchlist.map((subArray) => subArray["name"]);
 
@@ -109,6 +110,9 @@ function WatchListAction({uid}) {
         generalContext.openBuyWindow(uid);
 
     };
+    const handleChart= ()=> {
+       generalContext.openChart(uid);
+    }
     
     return(
         <span className="actions">
@@ -134,6 +138,7 @@ function WatchListAction({uid}) {
                 <Tooltip
                 title="analytics"
                 placement="top"
+                onClick={handleChart}
                 arrow
                 TransitionComponent={Grow}
                 

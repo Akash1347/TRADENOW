@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import {holdings} from '../data/data'
 import { VerticalGraph } from "./VerticalGraph";
+import StockPriceChart from "./StockPriceChart";
 
 
 const Holdings = () => {
@@ -88,6 +89,7 @@ const Holdings = () => {
         </div>
       </div>
       {allHoldings.length > 0 && <VerticalGraph data={data} />}
+      <StockPriceChart/>
     </>
   );
 };

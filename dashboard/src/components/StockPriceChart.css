@@ -1,0 +1,26 @@
+/* Full page center container */
+.lineChart {
+  position: relative;
+}
+
+/* Title styling */
+.lineChart h3 {
+  text-align: center;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #222;
+}
+
+/* Make chart responsive */
+.lineChart canvas {
+  max-height: 400px;
+}
+
+/* Optional: dark overlay behind chart */
+body::before {
+  content: "";
+  position:absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
