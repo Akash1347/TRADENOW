@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useMemo, useContext } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,7 +10,8 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import './StockPriceChart'
+import "./StockPriceChart.css";
+import GeneralContext from "./GeneralContext";
 
 ChartJS.register(
   CategoryScale,
@@ -23,56 +23,68 @@ ChartJS.register(
   Legend
 );
 
-const API_KEY = "37cbb721b9574d808b38cea04a9a18ad"; // put in .env in real projects
+const API_KEY = import.meta.env.STOCKPRICE_API_KEY;
 
 const options = {
   responsive: true,
   plugins: {
-    legend: {
-      position: "top",
-    },
-    title: {
-      display: true,
-      text: "Yearly Price Chart",
-    },
+    legend: { position: "top" },
+    title: { display: true, text: "Monthly Price Chart" },
   },
 };
 
 function StockPriceChart({ symbol = "INFY" }) {
-  const [yearlyData, setYearlyData] = useState([]);
+  const [dataPoints, setDataPoints] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const {closeChart} = useContext(GeneralContext);
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     const fetchData = async () => {
       try {
-        const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1day&outputsize=5000&apikey=${API_KEY}`;
-        const res = await fetch(url);
-        const data = await res.json();
+        if (API_KEY) {
+          const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1month&outputsize=20&apikey=${API_KEY}`;
+          const res = await fetch(url);
+          const data = await res.json();
 
-        if (!data.values) return;
+          if (data?.values?.length) {
+            const formatted = data.values
+              .map(d => ({
+                label: d.datetime,   // YYYY-MM
+                price: Number(d.close),
+              }))
+              .reverse(); // oldest → newest
 
-        // Convert daily → yearly
-        const yearlyMap = {};
-
-        data.values
-          .map(d => ({
-            date: new Date(d.datetime),
-            close: parseFloat(d.close),
-          }))
-          .sort((a, b) => a.date - b.date)
-          .forEach(item => {
-            const year = item.date.getFullYear();
-            yearlyMap[year] = item.close; // last close of year
-          });
-
-        const formatted = Object.keys(yearlyMap).map(year => ({
-          year,
-          price: yearlyMap[year],
-        }));
-
-        setYearlyData(formatted);
+            setDataPoints(formatted);
+            setError(null);
+            setLoading(false);
+            return;
+          }
+        }
+        // Fallback to mock data
+        console.log("Using mock data for", symbol);
+        const mockData = [
+          { label: "2023-01", price: 100 + Math.random() * 50 },
+          { label: "2023-02", price: 105 + Math.random() * 50 },
+          { label: "2023-03", price: 110 + Math.random() * 50 },
+          { label: "2023-04", price: 115 + Math.random() * 50 },
+          { label: "2023-05", price: 120 + Math.random() * 50 },
+          { label: "2023-06", price: 125 + Math.random() * 50 },
+          { label: "2023-07", price: 130 + Math.random() * 50 },
+          { label: "2023-08", price: 135 + Math.random() * 50 },
+          { label: "2023-09", price: 140 + Math.random() * 50 },
+          { label: "2023-10", price: 145 + Math.random() * 50 },
+          { label: "2023-11", price: 150 + Math.random() * 50 },
+          { label: "2023-12", price: 155 + Math.random() * 50 },
+        ];
+        setDataPoints(mockData);
+        setError(null);
       } catch (err) {
         console.error(err);
+        setError("Failed to fetch data");
+        setDataPoints([]);
       } finally {
         setLoading(false);
       }
@@ -81,23 +93,33 @@ function StockPriceChart({ symbol = "INFY" }) {
     fetchData();
   }, [symbol]);
 
-  if (loading) return <p>Loading...</p>;
-
-  const chartData = {
-    labels: yearlyData.map(item => item.year),
+  const chartData = useMemo(() => ({
+    labels: dataPoints.map(d => d.label),
     datasets: [
       {
-        label: `${symbol} Price (USD)`,
-        data: yearlyData.map(item => item.price),
+        label: `${symbol} Price`,
+        data: dataPoints.map(d => d.price),
         borderColor: "rgb(75, 192, 192)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
+        tension: 0.3,
       },
     ],
-  };
+  }), [dataPoints, symbol]);
 
+  if (loading) return <p>Loading...</p>;
+
+  if (error) return <p>Error: {error}</p>;
+
+  if (!dataPoints.length) return <p>No data available</p>;
+  const handleClose = ()=> {
+    closeChart();
+  }
   return (
-    <div className="container lineChart">
-      <h3>{symbol} – Yearly Price Comparison</h3>
+    <div className="  lineChart">
+      <div className="d-flex justify-content-between">
+        <h3>{symbol} – Monthly Price Trend</h3>
+        <button type="button" class="btn-close" aria-label="Close" onClick={handleClose}></button>
+      </div>
       <Line options={options} data={chartData} />
     </div>
   );

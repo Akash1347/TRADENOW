@@ -2,13 +2,65 @@ const User = require("../model/UsersModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail")
+const mongoose = require("mongoose");
+
+const {holdings} = require("../data/data");
+
+const Watchlist = require("../model/WatchListModel")
+const { WalletsModel } = require("../model/WalletsModel");
+const HoldingsSchema = require("../schema/HoldingsSchema");
+const HoldingsModel = mongoose.model("Holding", HoldingsSchema);
+ 
+
+const addHoldingsForNewUser = async(userId) => {
+    for(let i=0 ;i<holdings.length ;i++){
+        const data = {
+            userId:userId,
+            symbol:holdings[i].name,
+            quantity:holdings[i].qty,
+            avg:holdings[i].avg
+            
+        }
+        await HoldingsModel.create(data);
+        console.log("Holdings added for new user");
+    }
+}
+const addWallet = async(userId) => {
+    const data = {
+        userId:userId,
+    }
+    await WalletsModel.create(data);
+};
+const addwatchlistForNewUser = async(userId) => {
+    const watchlist = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA" ,"BINANCE:BTCUSDT", "BINANCE:ETHUSDT" , "BINANCE:BNBUSDT", "BINANCE:XRPUSDT", "META"];
+    const filteredData = watchlist.map(item => ({
+        userId:userId,
+        symbol:item
+    }));
+    await Watchlist.insertMany(filteredData);
+}
 
 
 module.exports.signin = async (req, res) => {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
-        return res.json({ success: false, message: "Invalid Details" });
+        return res.json({ success: false, message: "All fields are required" });
+    }
+ 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.json({ success: false, message: "Invalid email format" });
+    }
+
+    // Validate username length
+    if (username.length < 3 || username.length > 20) {
+        return res.json({ success: false, message: "Username must be 3-20 characters" });
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+        return res.json({ success: false, message: "Password must be at least 6 characters" });
     }
 
     try {
@@ -37,6 +89,9 @@ module.exports.signin = async (req, res) => {
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 24 * 60 * 60 * 1000,
         });
+        await addHoldingsForNewUser(data._id);
+        await addWallet(data._id);
+        await addwatchlistForNewUser(data._id);
         await sendEmail(
             data.email,
             "Welcome to TRADENOW",
@@ -328,6 +383,7 @@ module.exports.getUserData = async (req, res) => {
         return res.json({
             success: true,
             userData: {
+                userId:user._id,
                 username: user.username,
                 email: user.email,
                 isVerified: user.isAccountVerified,

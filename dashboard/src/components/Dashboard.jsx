@@ -15,6 +15,7 @@ import { UserContext } from "./userContext";
 import { Navigate } from "react-router-dom";
  
  
+ 
 
 const Dashboard = () => {
   const {userData} = useContext(UserContext);
@@ -34,7 +35,7 @@ const Dashboard = () => {
           <Route path="/funds" element={<Funds />} />
           <Route path="/apps" element={<Apps />} />
           <Route path="/verifyAccount" element={userData === null || userData.isVerified ? (<Navigate to="/" replace />) : (<VerifyAccount />)} />
-
+      
         </Routes>
       </div>
     </div>

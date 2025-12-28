@@ -13,7 +13,7 @@ function VerifyAccount() {
    
   const handleSendOtp = async()=> {
     try{
-        const response = await axios.post(backend_url+'/api/auth/sendverificationotp' ,{} ,{withCredentials:true});
+        const response = await axios.post(backend_url + '/api/auth/sendverificationotp', {}, { withCredentials: true });
         if(response.data.success){
             toast.success(response.data.message);
             setState("verifyOtp");
@@ -30,7 +30,7 @@ function VerifyAccount() {
   const verifyOtp = async(e)=> {
     e.preventDefault(); 
     try{
-        const response = await axios.post(backend_url+'/api/auth/verifyaccount' ,{otp} ,{withCredentials:true});
+        const response = await axios.post(backend_url + '/api/auth/verifyaccount', { otp }, { withCredentials: true });
          
         if(response.data.success){
             toast.success(response.data.message);

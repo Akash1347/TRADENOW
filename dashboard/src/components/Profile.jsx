@@ -21,7 +21,7 @@ function Profile(){
     const handleLogOut = async () => {
     try {
         await axios.post(
-        `${backend_url}/api/auth/logout`,
+        `${backend_url}api/auth/logout`,
         {},
         { withCredentials: true }
         );
@@ -47,13 +47,14 @@ function Profile(){
                 <>
                 <li className="list-group-item profile-item" >Profile</li>
               
-                <li className="list-group-item profile-item" onClick={handleVerify}>Verify</li>
+                
 
              
                 <li className="list-group-item profile-item">Settings</li>
-                {userData?.isVerified && (
-                    <li className="list-group-item profile-item" onClick={handleLogOut}>Logout</li>
-                )}                
+                {!userData.isVerified && (
+                    <li className="list-group-item profile-item" onClick={handleVerify}>Verify</li>
+                )}  
+                <li className="list-group-item profile-item" onClick={handleLogOut}>Logout</li>              
                 </>
             ) : (
                 <li className="list-group-item profile-item" onClick={handleLogIn}>Log In</li>

@@ -1,10 +1,35 @@
-export const watchlist = [
+const watchlist = [
   {
     name: "AAPL",
     price: 189.45,
     percent: "+0.82%",
     isDown: false,
   },
+  {
+    name:"BINANCE:BTCUSDT",
+    price: 27345.12,
+    percent: "-1.25%",
+    isDown: true,
+  },
+  {
+    name: "BINANCE:ETHUSDT",
+    price: 1585.40,
+    percent: "0.82%",
+    isDown: false,
+  },
+  {
+    name: "BINANCE:BNBUSDT",
+    price: 242.18,
+    percent: "-0.45%",
+    isDown: true,
+  },
+  {
+    name: "BINANCE:XRPUSDT",
+    price: 0.6234,
+    percent: "1.92%",
+    isDown: false,
+  },
+
   {
     name: "MSFT",
     price: 417.30,
@@ -53,15 +78,8 @@ export const watchlist = [
 
 
 // holdings
-export const holdings = [
-  {
-    name: "BHARTIARTL",
-    qty: 2,
-    avg: 538.05,
-    price: 541.15,
-    net: "+0.58%",
-    day: "+2.99%",
-  },
+const holdings = [
+  
   {
     name: "HDFCBANK",
     qty: 2,
@@ -95,23 +113,7 @@ export const holdings = [
     net: "+2.92%",
     day: "+0.80%",
   },
-  {
-    name: "KPITTECH",
-    qty: 5,
-    avg: 250.3,
-    price: 266.45,
-    net: "+6.45%",
-    day: "+3.54%",
-  },
-  {
-    name: "M&M",
-    qty: 2,
-    avg: 809.9,
-    price: 779.8,
-    net: "-3.72%",
-    day: "-0.01%",
-    isLoss: true,
-  },
+   
   {
     name: "RELIANCE",
     qty: 1,
@@ -129,23 +131,7 @@ export const holdings = [
     day: "-0.34%",
     isLoss: true,
   },
-  {
-    name: "SGBMAY29",
-    qty: 2,
-    avg: 4727.0,
-    price: 4719.0,
-    net: "-0.17%",
-    day: "+0.15%",
-  },
-  {
-    name: "TATAPOWER",
-    qty: 5,
-    avg: 104.2,
-    price: 124.15,
-    net: "+19.15%",
-    day: "-0.24%",
-    isLoss: true,
-  },
+   
   {
     name: "TCS",
     qty: 1,
@@ -166,7 +152,7 @@ export const holdings = [
 ];
 
 // positions
-export const positions = [
+const positions = [
   {
     product: "CNC",
     name: "EVEREADY",
@@ -188,3 +174,5 @@ export const positions = [
     isLoss: true,
   },
 ];
+
+module.exports = { watchlist, holdings, positions };

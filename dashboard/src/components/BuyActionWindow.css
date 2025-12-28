@@ -1,8 +1,8 @@
 .container {
     --radius: 4px;
-    width: 40%;
+    width: 30% !important;
     height: 63%;
-    background: rgb(245, 245, 245);
+    background: rgb(240, 239, 239);
     position: absolute;
     bottom: 0;
     left: 35%;
@@ -10,7 +10,7 @@
     box-sizing: border-box;
     z-index: 100;
     border-radius: var(--radius);
-    border: 1px solid rgb(238, 238, 238);
+    border: 1px solid rgb(0, 0, 0);
   }
   
   .dragging {
@@ -54,7 +54,7 @@
   }
   
   .market-options input[type="radio"] {
-    border: 1px solid #ddd;
+    border: 1px solid #1b1b1b;
     cursor: pointer;
     padding: 2px;
     margin-right: 6px;
@@ -64,7 +64,7 @@
     width: 100%;
     box-sizing: border-box;
     background-color: #f9f9f9;
-    border-bottom: 2px solid rgba(180, 180, 180, 0.6);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.6);
   }
   
   .tab button {

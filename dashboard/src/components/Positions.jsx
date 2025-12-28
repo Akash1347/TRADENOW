@@ -1,21 +1,22 @@
-import React ,{useState ,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { positions } from "../data/data";
 
 const Positions = () => {
-  const [allPositions ,setAllPositions] = useState([]);
+  const [allPositions, setAllPositions] = useState([]);
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
-    axios.get("http://localhost:3001/allpositions").then((res) => {
+    axios.get(backendUrl + "/allpositions").then((res) => {
       console.log("API Response:", res.data);
-       
+
       setAllPositions(res.data);
     }).catch((error) => {
       console.error("Error fetching holdings:", error);
     });
   }, []);
   return (
-    
+
     <>
       <h3 className="title">Positions ({allPositions.length})</h3>
 

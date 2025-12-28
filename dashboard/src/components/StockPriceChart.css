@@ -1,6 +1,8 @@
 /* Full page center container */
 .lineChart {
   position: relative;
+  width: 60% !important;
+
 }
 
 /* Title styling */
@@ -11,16 +13,24 @@
   color: #222;
 }
 
-/* Make chart responsive */
-.lineChart canvas {
-  max-height: 400px;
+canvas {
+  background-color: rgb(255, 255, 255);
 }
 
-/* Optional: dark overlay behind chart */
-body::before {
-  content: "";
-  position:absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 999;
+.lineChart {
+
+
+  --radius: 4px;
+  width: 50% !important;
+  height: 55% !important;
+  background: rgb(245, 245, 245);
+  position: absolute;
+  bottom: 0;
+  left: 32% !important;
+  cursor: move;
+  box-sizing: border-box;
+  z-index: 100;
+  border-radius: var(--radius);
+  border: 1px solid rgba(112, 112, 112, 0.56);
+  top: 25% !important;
 }

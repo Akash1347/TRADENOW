@@ -4,30 +4,28 @@ import GeneralContext from "./GeneralContext";
 
 import "./BuyActionWindow.css";
 
-const BuyActionWindow = ({ uid, price }) => {
-  const { closeBuyWindow } = useContext(GeneralContext);
+const SellActionWindow = ({ uid, price }) => {
+  const { closeSellWindow } = useContext(GeneralContext);
 
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(price);
   const [orderType, setOrderType] = useState("MARKET");
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
- 
-  const handleBuyClick = () => {
-    axios.post(backendUrl + "/api/order/buy", {
+
+  const handleSellClick = () => {
+    axios.post(backendUrl + "/api/order/sell", {
       symbol: uid,
       quantity: stockQuantity,
       price: stockPrice,
-      side: "BUY",
+      side: "SELL",
       orderType: orderType
     }, { withCredentials: true });
 
-
-
-    closeBuyWindow();
+    closeSellWindow();
   };
 
   const handleCancelClick = () => {
-    closeBuyWindow();
+    closeSellWindow();
   };
 
   const handleMarketClick = () => {
@@ -36,7 +34,7 @@ const BuyActionWindow = ({ uid, price }) => {
   }
 
   return (
-    <div className="container" id="buy-window" draggable="true">
+    <div className="container" id="sell-window" draggable="true">
       <div className="regular-order">
         <div className="inputs">
           <fieldset>
@@ -91,8 +89,8 @@ const BuyActionWindow = ({ uid, price }) => {
       <div className="buttons">
         <span>Margin required {price}</span>
         <div>
-          <button className="btn btn-blue" onClick={handleBuyClick}>
-            Buy
+          <button className="btn btn-blue" onClick={handleSellClick}>
+            Sell
           </button>
           <button className="btn btn-grey" onClick={handleCancelClick}>
             Cancel
@@ -103,4 +101,4 @@ const BuyActionWindow = ({ uid, price }) => {
   );
 };
 
-export default BuyActionWindow;
+export default SellActionWindow;

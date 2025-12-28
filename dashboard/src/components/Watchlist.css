@@ -1,0 +1,74 @@
+/* Container Layout */
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Input Wrapper to position the icon */
+.input-wrapper {
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+
+/* The Search Input Field */
+.search-input-field {
+    background-color: #f1f0f0ff;
+    border-radius: 20px;
+    border: 2px solid transparent;
+    padding: 10px 20px 10px 45px; /* Space for the search icon */
+    width: 100%;
+    font-size: 15px;
+    color: #333;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+/* Interaction Effects */
+.search-input-field:focus {
+    background-color: #ffffff;
+    border-color: #3a7df0ff;
+    box-shadow: 0 4px 12px rgba(58, 125, 240, 0.15);
+}
+
+/* Search Icon inside the box */
+.search-icon {
+    position: absolute;
+    left: 18px;
+    color: #888;
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+/* The "Add" Button Styling */
+.search-add-btn {
+    background-color: #3a7df0ff;
+    color: white;
+    border-radius: 15px;
+    height: 40px;
+    padding: 0 25px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(58, 125, 240, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Button Hover & Active States */
+.search-add-btn:hover {
+    background-color: #2a6ce0;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(58, 125, 240, 0.3);
+}
+
+.search-add-btn:active {
+    transform: translateY(1px);
+}

@@ -45,11 +45,11 @@ function ForgotPassword() {
       const res = await axios.post(
         
         `${backend_url}api/auth/resetpassword`,
-        { email, otp, password }
+        { email, otp, newPassword :password }
       );
       if (res.data.success) {
         toast.success("Password updated");
-        navigate("/login");
+        navigate("/signup");
       } else {
         toast.error(res.data.message);
       }
