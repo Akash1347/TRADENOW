@@ -3,7 +3,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import WatchListAction from "./WatchListAction";
 
-function WatchListItem({ stock, onRemove }) {
+function WatchListItem({ stock, onRemove, isMarketOpen }) {
   const [showWatchlistAction, setShowWatchlistAction] = useState(false);
   const [hideTimeout, setHideTimeout] = useState(null);
 
@@ -23,18 +23,26 @@ function WatchListItem({ stock, onRemove }) {
     setHideTimeout(timeout);
   };
 
+  const isZeroPriceAndMarketClosed = stock.price === "0.00" && !isMarketOpen;
+
   return (
     <li onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className="watch-list-row" style={{fontSize:"1rem"}}>
       <div className="item">
         <p className={stock.isDown ? "down" : "up"}>{stock.name}</p>
         <div className="itemInfo">
-          <span className="percent">{stock.percent}</span>
-          {stock.isDown ? (
-            <KeyboardArrowDownIcon className="down" />
+          {isZeroPriceAndMarketClosed ? (
+            <span className="price">Market Closed</span>
           ) : (
-            <KeyboardArrowUpIcon className="up" />
+            <>
+              <span className="percent">{stock.percent}</span>
+              {stock.isDown ? (
+                <KeyboardArrowDownIcon className="down" />
+              ) : (
+                <KeyboardArrowUpIcon className="up" />
+              )}
+              <span className="price">{stock.price}</span>
+            </>
           )}
-          <span className="price">{stock.price}</span>
         </div>
       </div>
       {showWatchlistAction && (

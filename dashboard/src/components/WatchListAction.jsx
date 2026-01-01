@@ -4,15 +4,21 @@ import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import GeneralContext from "./GeneralContext";
 import DeleteIcon from '@mui/icons-material/Delete';
 
-function WatchListAction({ uid, onRemove , price}) {
+function WatchListAction({ uid, onRemove , price, isMarketOpen}) {
   const generalContext = useContext(GeneralContext);
 
+  const isDisabled = !isMarketOpen && price === "0.00";
+
   const handleBuyClick = () => {
-    generalContext.openBuyWindow(uid , price);
+    if (!isDisabled) {
+      generalContext.openBuyWindow(uid , price);
+    }
   };
 
   const handleSellClick = () => {
-    generalContext.openSellWindow(uid , price);
+    if (!isDisabled) {
+      generalContext.openSellWindow(uid , price);
+    }
   };
 
   const handleChart = () => {
@@ -29,22 +35,22 @@ function WatchListAction({ uid, onRemove , price}) {
     <span className="actions">
       <span>
         <Tooltip
-          title="Buy (B)"
+          title={isDisabled ? "Market Closed" : "Buy (B)"}
           placement="top"
           arrow
           TransitionComponent={Grow}
           onClick={handleBuyClick}
         >
-          <button className="buy">Buy</button>
+          <button className="buy" disabled={isDisabled} style={isDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}>Buy</button>
         </Tooltip>
         <Tooltip
-          title="Sell (S)"
+          title={isDisabled ? "Market Closed" : "Sell (S)"}
           placement="top"
           arrow
           TransitionComponent={Grow}
           onClick={handleSellClick}
         >
-          <button className="sell">Sell</button>
+          <button className="sell" disabled={isDisabled} style={isDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}>Sell</button>
         </Tooltip>
         <Tooltip
           title="analytics"

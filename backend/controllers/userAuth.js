@@ -4,38 +4,38 @@ const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail")
 const mongoose = require("mongoose");
 
-const {holdings} = require("../data/data");
+const { holdings } = require("../data/data");
 
 const Watchlist = require("../model/WatchListModel")
 const { WalletsModel } = require("../model/WalletsModel");
 const HoldingsSchema = require("../schema/HoldingsSchema");
 const HoldingsModel = mongoose.model("Holding", HoldingsSchema);
- 
 
-const addHoldingsForNewUser = async(userId) => {
-    for(let i=0 ;i<holdings.length ;i++){
+
+const addHoldingsForNewUser = async (userId) => {
+    for (let i = 0; i < holdings.length; i++) {
         const data = {
-            userId:userId,
-            symbol:holdings[i].name,
-            quantity:holdings[i].qty,
-            avg:holdings[i].avg
-            
+            userId: userId,
+            symbol: holdings[i].name,
+            quantity: holdings[i].qty,
+            avg: holdings[i].avg
+
         }
         await HoldingsModel.create(data);
         console.log("Holdings added for new user");
     }
 }
-const addWallet = async(userId) => {
+const addWallet = async (userId) => {
     const data = {
-        userId:userId,
+        userId: userId,
     }
     await WalletsModel.create(data);
 };
-const addwatchlistForNewUser = async(userId) => {
-    const watchlist = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA" ,"BINANCE:BTCUSDT", "BINANCE:ETHUSDT" , "BINANCE:BNBUSDT", "BINANCE:XRPUSDT", "META"];
+const addwatchlistForNewUser = async (userId) => {
+    const watchlist = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA", "META", "NVDA", "NFLX", "BINANCE:BTCUSDT", "BINANCE:ETHUSDT", "BINANCE:BNBUSDT"];
     const filteredData = watchlist.map(item => ({
-        userId:userId,
-        symbol:item
+        userId: userId,
+        symbol: item
     }));
     await Watchlist.insertMany(filteredData);
 }
@@ -47,7 +47,7 @@ module.exports.signin = async (req, res) => {
     if (!username || !email || !password) {
         return res.json({ success: false, message: "All fields are required" });
     }
- 
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         return res.json({ success: false, message: "Invalid email format" });
@@ -383,7 +383,7 @@ module.exports.getUserData = async (req, res) => {
         return res.json({
             success: true,
             userData: {
-                userId:user._id,
+                userId: user._id,
                 username: user.username,
                 email: user.email,
                 isVerified: user.isAccountVerified,

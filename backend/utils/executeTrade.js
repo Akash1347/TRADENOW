@@ -4,6 +4,8 @@ const { WalletsModel } = require("../model/WalletsModel");
 const HoldingsModel = require("../model/HoldingsModel");
 const { TradesModel } = require("../model/TradesModel");
 
+const {notifyUser} = require("./notify");
+
 /**
  * Executes a trade between a buyer and seller
  * This function handles all the atomic updates needed for a trade:
@@ -134,6 +136,17 @@ async function executeTrade({ buyerOrder, sellerOrder, quantity, price }) {
     // Everything succeeded, commit the transaction
     await session.commitTransaction();
     session.endSession();
+
+    // Notify both users about the trade execution
+    notifyUser(buyerOrder.userId, {
+      type: "success",
+      message: `Bought ${quantity} shares of ${buyerOrder.symbol} at $${price} each.`
+    
+    });
+    notifyUser(sellerOrder.userId, {
+      type: "success",
+      message: `Sold ${quantity} shares of ${sellerOrder.symbol} at $${price} each.`
+    });
 
     return { 
       success: true, 

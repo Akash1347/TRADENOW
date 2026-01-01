@@ -1,30 +1,39 @@
 const { Server } = require("socket.io");
 const Watchlist = require("./model/WatchListModel");
+const {initNotifier, notifyUser} = require("./utils/notify");
 const {
   connectFinnhub,
   subscribeSymbol,
   unsubscribeSymbol
 } = require("./finnhub");
 
+
 module.exports = function initSocket(server) {
   
   const io = new Server(server, { 
     cors: { 
-      origin: ["http://localhost:5173", "http://localhost:5174"],
+      origin: [process.env.DASHBOARD_URL, process.env.FRONTEND_URL],
       credentials: true 
     } 
   });
 
+
   const activeSymbols = new Set();
   const symbolRefCount = new Map();
   const userSockets = new Map();
+
+
+  initNotifier(io);
+
+   
 
   io.on("connection", async (socket) => {
     console.log("New socket connection:", socket.id);
     
     
     const userId = socket.handshake.query.userId;
-    
+    socket.join(userId); //notification room
+
     if (!userId) {
       console.log("No userId provided, disconnecting socket");
       return socket.disconnect();
@@ -122,7 +131,7 @@ module.exports = function initSocket(server) {
   connectFinnhub((trades) => {
     trades.forEach(t => {
       
-      io.to(t.s).emit("price-update", {
+      io.to(t.s).emit("price-update", { // emit to symbol room
         s: t.s,   
         p: t.p,   
         t: t.t,   

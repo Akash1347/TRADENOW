@@ -1,5 +1,6 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
+import { io } from "socket.io-client";
 
 import Apps from "./Apps";
 import Funds from './Funds'
@@ -13,12 +14,32 @@ import VerifyAccount from "./verifyAccount";
 import { GeneralContextProvider } from "./GeneralContext";
 import { UserContext } from "./userContext";
 import { Navigate } from "react-router-dom";
+import { showToast } from "./toast.jsx";
  
  
  
 
 const Dashboard = () => {
   const {userData} = useContext(UserContext);
+
+  useEffect(() => {
+    if (!userData?.userId) return;
+
+    const socket = io(import.meta.env.VITE_BACKEND_URL, {
+      query: { userId: userData.userId },
+      withCredentials: true,
+    });
+
+    socket.on("notification", (data) => {
+      console.log("Received notification:", data);
+      showToast(data.message, data.type);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [userData?.userId]);
+
   return (
     <div className="dashboard-container">
       

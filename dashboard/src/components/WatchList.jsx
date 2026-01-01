@@ -5,6 +5,7 @@ import WatchListItem from "./WatchListItem";
 import { DoughnutChart } from "./DoughnoutChart";
 import { UserContext } from "./userContext";
 import GeneralContext from "./GeneralContext";
+import { showToast } from "./toast.jsx";
 import "./Watchlist.css";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -15,6 +16,28 @@ function WatchList() {
   const [input, setInput] = useState("");
   const socketRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
+
+  // Function to check if US market is open
+  const isMarketOpen = () => {
+    const now = new Date();
+    // Convert to ET (UTC-5)
+    const etOffset = -5 * 60; // ET is UTC-5
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const etTime = new Date(utc + (etOffset * 60000));
+
+    const day = etTime.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    const hours = etTime.getHours();
+    const minutes = etTime.getMinutes();
+
+    // Market open: Mon-Fri, 9:30 AM - 4:00 PM ET
+    if (day >= 1 && day <= 5) {
+      const currentMinutes = hours * 60 + minutes;
+      const openMinutes = 9 * 60 + 30; // 9:30
+      const closeMinutes = 16 * 60; // 4:00
+      return currentMinutes >= openMinutes && currentMinutes < closeMinutes;
+    }
+    return false;
+  };
 
   // Initialize socket connection when userId exists
   useEffect(() => {
@@ -279,6 +302,7 @@ function WatchList() {
               stock={stock}
               key={stock.symbol || index}
               onRemove={() => removeSymbol(stock.symbol)}
+              isMarketOpen={isMarketOpen()}
             />
           ))
         )}

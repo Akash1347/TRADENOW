@@ -5,6 +5,7 @@ const { executeTrade } = require("../utils/executeTrade");
 
 const isValidOrderType = (t) => t === "MARKET" || t === "LIMIT";
 
+const {notifyUser} = require("../utils/notify");
 /* =========================
    BUY – MARKET
 ========================= */
@@ -43,6 +44,13 @@ const buyAtMarketPrice = async (order) => {
       status: remaining === 0 ? "COMPLETED" : "CANCELLED",
     }
   );
+  if (remaining > 0){
+    notifyUser(order.userId, {
+      type: "info",
+      message: `Your BUY MARKET order for ${order.symbol} was only partially filled. Remaining quantity: ${remaining}.`,
+      orderId: order._id,
+    });
+  }
 
   if (order.lockedAmount > spent) {
     await WalletsModel.updateOne(
@@ -239,6 +247,11 @@ module.exports.placeBuyOrder = async (req, res) => {
       status: "OPEN",
       lockedAmount,
     });
+    notifyUser(userId, { // notify user
+      type: "info",
+      message: `Your BUY order for ${quantity} shares of ${upperSymbol} has been placed successfully.`,
+      orderId: order._id,
+    });
 
     if (orderType === "MARKET") await buyAtMarketPrice(order);
     else await buyAtLimitPrice(order);
@@ -296,6 +309,12 @@ module.exports.placeSellOrder = async (req, res) => {
       side: "SELL",
       orderType,
       status: "OPEN",
+    });
+
+    notifyUser(userId, { //notifiy seller
+      type: "info",
+      message: `Your SELL order for ${quantity} shares of ${upperSymbol} has been placed successfully.`,
+      orderId: order._id,
     });
 
     if (orderType === "MARKET") await sellAtMarketPrice(order);
