@@ -9,7 +9,9 @@ import Funds from './components/Funds.jsx'
 import Holdings from './components/Holdings.jsx'
 import Positions from './components/Positions.jsx'
 import NotFound from './components/NotFound.jsx'
-import VerifyAccount from "./components/verifyAccount.jsx";
+//import VerifyAccount from "./components/verifyAccount.jsx";
+import VerifyAccount from "./components/VerifyAccount.jsx";
+
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

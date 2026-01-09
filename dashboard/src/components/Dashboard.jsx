@@ -10,7 +10,7 @@ import Orders from "./Orders";
 import Positions from "./Positions";
 import Summary from "./Summary";
 import WatchList from "./WatchList";
-import VerifyAccount from "./verifyAccount";
+import VerifyAccount from "./VerifyAccount";
 import { GeneralContextProvider } from "./GeneralContext";
 import { UserContext } from "./userContext";
 import { Navigate } from "react-router-dom";

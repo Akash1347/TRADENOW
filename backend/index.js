@@ -15,7 +15,7 @@ const cors = require("cors");
 const http = require("http");
 const initSocket = require("./socket");
 
-const PORT = process.env.port || 3001;
+const PORT = process.env.PORT || 3001;
 const url = process.env.MONGO_URL;
 const app = express();
 

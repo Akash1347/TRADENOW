@@ -11,7 +11,7 @@ import PricingPage from './landing_page/pricing/PricingPage';
 import Navbar from './landing_page/Navbar';
 import Footer from './landing_page/Footer';
 import NotFound from './landing_page/NotFound';
-import ForgotPassowrd from './landing_page/signup/forgotPassword';
+import ForgotPassowrd from './landing_page/signup/ForgotPassword';
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
