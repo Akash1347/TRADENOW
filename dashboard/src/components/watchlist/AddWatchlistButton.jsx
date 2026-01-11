@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
-import { UserContext } from './userContext';
+import { UserContext } from '../../contexts/userContext';
 import axios from 'axios';
-import { showToast } from './toast.jsx';
+import { showToast } from '../ui/toast.jsx';
 
 function AddWatchlistButton({ symbol }) {
   const { userData, addUserWatchlist, userWatchlist } = useContext(UserContext);

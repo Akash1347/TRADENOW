@@ -11,7 +11,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import "./StockPriceChart.css";
-import GeneralContext from "./GeneralContext";
+import GeneralContext from "../../contexts/GeneralContext";
 
 ChartJS.register(
   CategoryScale,
@@ -37,7 +37,7 @@ function StockPriceChart({ symbol = "INFY" }) {
   const [dataPoints, setDataPoints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const {closeChart} = useContext(GeneralContext);
+  const { closeChart } = useContext(GeneralContext);
 
   useEffect(() => {
     setLoading(true);
@@ -111,7 +111,7 @@ function StockPriceChart({ symbol = "INFY" }) {
   if (error) return <p>Error: {error}</p>;
 
   if (!dataPoints.length) return <p>No data available</p>;
-  const handleClose = ()=> {
+  const handleClose = () => {
     closeChart();
   }
   return (

@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { UserContext, UserContextProvider } from "./userContext";
-import "./profile.css"
+import { UserContext } from "../../contexts/userContext";
+import "./profile.css";
 import axios from "axios";
 import {toast} from "react-toastify";
 import { useNavigate } from "react-router-dom";

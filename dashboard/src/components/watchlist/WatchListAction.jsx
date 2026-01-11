@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Tooltip, Grow } from "@mui/material";
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
-import GeneralContext from "./GeneralContext";
+import GeneralContext from "../../contexts/GeneralContext";
 import DeleteIcon from '@mui/icons-material/Delete';
 
 function WatchListAction({ uid, onRemove , price, isMarketOpen}) {

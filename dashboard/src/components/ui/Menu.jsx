@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { UserContext } from "./userContext";
-import Profile from "./Profile";
+import { UserContext } from "../../contexts/userContext";
+import Profile from "../trading/Profile";
 
 function Menu() {
   const { isLoggedIn, userData } = useContext(UserContext);

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
-import { holdings } from '../data/data'
-import { VerticalGraph } from "./VerticalGraph";
-import StockPriceChart from "./StockPriceChart";
+import { holdings } from '../../data/data'
+import { VerticalGraph } from "../ui/VerticalGraph";
+import StockPriceChart from "../charts/StockPriceChart";
 
 
 const Holdings = () => {

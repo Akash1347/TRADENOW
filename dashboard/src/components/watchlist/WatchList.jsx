@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { io } from "socket.io-client";
 import axios from "axios";
-import WatchListItem from "./WatchListItem";
-import { DoughnutChart } from "./DoughnoutChart";
-import { UserContext } from "./userContext";
-import GeneralContext from "./GeneralContext";
-import { showToast } from "./toast.jsx";
+import WatchListItem from "./WatchListItem.jsx";
+import { DoughnutChart } from "../charts/DoughnoutChart.jsx";
+import { UserContext } from "../../contexts/userContext";
+import GeneralContext from "../../contexts/GeneralContext";
+import { showToast } from "../ui/toast.jsx";
 import "./Watchlist.css";
-import SearchElements from "./SearchElements.jsx";
+import SearchElements from "../ui/SearchElements.jsx";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 function WatchList() {

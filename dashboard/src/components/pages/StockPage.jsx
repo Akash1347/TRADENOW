@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import CandleChart from './CandleChart';
-import AddWatchlistButton from './AddWatchlistButton';
-import GeneralContext from './GeneralContext';
+import CandleChart from '../charts/CandleChart';
+import AddWatchlistButton from '../watchlist/AddWatchlistButton';
+import GeneralContext from '../../contexts/GeneralContext';
 import './StockPage.css';
 
 function StockPage() {

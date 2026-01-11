@@ -2,23 +2,24 @@ import React, { useContext, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import { io } from "socket.io-client";
 
-import Apps from "./Apps";
-import Funds from './Funds'
-import Holdings from "./Holdings";
+import Apps from "../trading/Apps";
+import Funds from '../trading/Funds'
+import Holdings from "../trading/Holdings";
 
-import Orders from "./Orders";
-import Positions from "./Positions";
+import Orders from "../trading/Orders";
+import Positions from "../trading/Positions";
 import Summary from "./Summary";
-import WatchList from "./WatchList";
-import VerifyAccount from "./VerifyAccount";
-import { GeneralContextProvider } from "./GeneralContext";
-import { UserContext } from "./userContext";
+import WatchList from "../watchlist/WatchList";
+import VerifyAccount from "../trading/VerifyAccount";
+import { GeneralContextProvider } from "../../contexts/GeneralContext";
+import { UserContext } from "../../contexts/userContext";
 import { Navigate } from "react-router-dom";
-import { showToast } from "./toast.jsx";
+import { showToast } from "../ui/toast.jsx";
 import StockPage from "./StockPage.jsx";
- 
- 
- 
+import NotFound from "../actionWindow/NotFound.jsx";
+
+
+
 
 const Dashboard = () => {
   const {userData} = useContext(UserContext);
@@ -56,6 +57,7 @@ const Dashboard = () => {
               <Route path="/apps" element={<Apps />} />
               <Route path="/verifyAccount" element={userData === null || userData.isVerified ? (<Navigate to="/" replace />) : (<VerifyAccount />)} />
               <Route path="/stock" element={<StockPage />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
         </GeneralContextProvider>

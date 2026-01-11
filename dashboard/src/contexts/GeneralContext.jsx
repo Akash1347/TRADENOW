@@ -1,8 +1,8 @@
 import React, { createContext, useState } from 'react';
 
-import BuyActionWindow from "./BuyActionWindow";
-import SellActionWindow from "./SellActionWindow";
-import StockPriceChart from './StockPriceChart';
+import BuyActionWindow from "../components/actionWindow/BuyActionWindow";
+import SellActionWindow from "../components/actionWindow/SellActionWindow";
+import StockPriceChart from '../components/charts/StockPriceChart';
 
 
 const GeneralContext = createContext({

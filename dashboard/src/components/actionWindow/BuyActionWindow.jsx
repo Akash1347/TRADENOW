@@ -1,12 +1,12 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
-import GeneralContext from "./GeneralContext";
-import { showToast } from "./toast.jsx";
+import GeneralContext from "../../contexts/GeneralContext";
+import { showToast } from "../ui/toast.jsx";
 
 import "./BuyActionWindow.css";
 
-const SellActionWindow = ({ uid, price }) => {
-  const { closeSellWindow } = useContext(GeneralContext);
+const BuyActionWindow = ({ uid, price }) => {
+  const { closeBuyWindow } = useContext(GeneralContext);
 
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(price);
@@ -14,35 +14,35 @@ const SellActionWindow = ({ uid, price }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  const handleSellClick = async () => {
+  const handleBuyClick = async () => {
     if (isSubmitting) return;
 
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post(backendUrl + "/api/order/sell", {
+      const response = await axios.post(backendUrl + "/api/order/buy", {
         symbol: uid,
         quantity: parseInt(stockQuantity),
         price: parseFloat(stockPrice),
-        side: "SELL",
+        side: "BUY",
         orderType: orderType
       }, { withCredentials: true });
 
       if (response.data.success) {
-        showToast(`Sell order placed successfully for ${stockQuantity} shares of ${uid}`, "success");
-        closeSellWindow();
+        showToast(`Buy order placed successfully for ${stockQuantity} shares of ${uid}`, "success");
+        closeBuyWindow();
       } else {
         showToast(response.data.message || "Failed to place order", "error");
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to place order";
 
-      if (errorMessage.includes("Insufficient holdings")) {
-        showToast(errorMessage, "error");
-        // Don't close the window so user can adjust quantity
+      if (errorMessage === "Insufficient balance") {
+        showToast(`Insufficient balance. Required: $${(parseFloat(stockPrice) * parseInt(stockQuantity)).toFixed(2)}`, "error");
+        // Don't close the window so user can adjust
       } else {
         showToast(errorMessage, "error");
-        closeSellWindow();
+        closeBuyWindow();
       }
     } finally {
       setIsSubmitting(false);
@@ -50,7 +50,7 @@ const SellActionWindow = ({ uid, price }) => {
   };
 
   const handleCancelClick = () => {
-    closeSellWindow();
+    closeBuyWindow();
   };
 
   const handleMarketClick = () => {
@@ -59,7 +59,7 @@ const SellActionWindow = ({ uid, price }) => {
   }
 
   return (
-    <div className="container" id="sell-window" draggable="true">
+    <div className="container" id="buy-window" draggable="true">
       <div className="regular-order">
         <div className="inputs">
           <fieldset>
@@ -114,8 +114,8 @@ const SellActionWindow = ({ uid, price }) => {
       <div className="buttons">
         <span>Margin required {price}</span>
         <div>
-          <button className="btn btn-blue" onClick={handleSellClick}>
-            Sell
+          <button className="btn btn-blue" onClick={handleBuyClick}>
+            Buy
           </button>
           <button className="btn btn-grey" onClick={handleCancelClick}>
             Cancel
@@ -126,4 +126,4 @@ const SellActionWindow = ({ uid, price }) => {
   );
 };
 
-export default SellActionWindow;
+export default BuyActionWindow;
