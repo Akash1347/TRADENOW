@@ -7,15 +7,17 @@ import { UserContext } from "./userContext";
 import GeneralContext from "./GeneralContext";
 import { showToast } from "./toast.jsx";
 import "./Watchlist.css";
+import SearchElements from "./SearchElements.jsx";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 function WatchList() {
-  const { userData } = useContext(UserContext);
+  const { userData, userWatchlist, removeUserWatchlist } = useContext(UserContext);
   const generalContext = useContext(GeneralContext);
-  const [watchlist, setWatchlist] = useState([]);
   const [input, setInput] = useState("");
   const socketRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [search, setSearch] = useState([]);
+  const [watchlistItems, setWatchlistItems] = useState([]);
 
   // Function to check if US market is open
   const isMarketOpen = () => {
@@ -71,8 +73,13 @@ function WatchList() {
     socketRef.current.on("price-update", (trade) => {
       console.log("Received price update:", trade);
 
-      setWatchlist((currentList) =>
-        currentList.map((item) => {
+      setWatchlistItems((currentList) => {
+        if (!Array.isArray(currentList)) {
+          console.warn("currentList is not an array:", currentList);
+          return currentList;
+        }
+
+        return currentList.map((item) => {
           if (item.symbol === trade.s) {
             const oldPrice = parseFloat(item.price);
             const newPrice = parseFloat(trade.p);
@@ -91,8 +98,8 @@ function WatchList() {
             };
           }
           return item;
-        })
-      );
+        });
+      });
     });
 
     // Cleanup on unmount or userId change
@@ -103,97 +110,81 @@ function WatchList() {
     };
   }, [userData?.userId, userData?._id]);
 
-  // Load watchlist from database
-  useEffect(() => {
+  // Function to fetch watchlist data
+  const fetchWatchlist = async () => {
     if (!userData?.email) {
       console.log("No email, skipping watchlist fetch");
       return;
     }
 
-    async function fetchWatchlist() {
-      try {
-        const response = await axios.get(`${BACKEND_URL}/api/watchlist/${userData.email}`);
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/watchlist/${userData.email}`);
 
-        console.log("Watchlist response:", response.data);
+      console.log("Watchlist response:", response.data);
 
-        if (response.data && Array.isArray(response.data)) {
-          const enrichedWatchlist = response.data.map(item => ({
-            symbol: item.symbol,
-            name: item.symbol,
-            price: "0.00", // Will be updated by socket
-            percent: "0.00%",
-            isDown: false,
-            lastUpdate: null
-          }));
-          setWatchlist(enrichedWatchlist);
-        } else if (response.data && response.data.success === false) {
-          console.error("Auth error:", response.data.message);
-          setWatchlist([]);
-        }
-      } catch (err) {
-        console.error("Error fetching watchlist:", err);
-        if (err.response?.status === 401) {
-          console.error("Authentication required");
-        }
-        setWatchlist([]);
+      if (response.data && Array.isArray(response.data)) {
+        console.log("Watchlist fetched successfully:", response.data.length, "items");
+        // Note: We don't set local state here anymore - context handles it
+      } else if (response.data && response.data.success === false) {
+        console.error("Auth error:", response.data.message);
+      }
+    } catch (err) {
+      console.error("Error fetching watchlist:", err);
+      if (err.response?.status === 401) {
+        console.error("Authentication required");
       }
     }
+  };
 
+  // Load watchlist from database
+  useEffect(() => {
     fetchWatchlist();
   }, [userData?.email]);
 
+  // Listen for storage changes to refresh watchlist
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'watchlist-updated') {
+        console.log("Watchlist updated, refreshing...");
+        fetchWatchlist();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Sync watchlistItems with userWatchlist from context
+  useEffect(() => {
+    if (userWatchlist && Array.isArray(userWatchlist)) {
+      setWatchlistItems(userWatchlist.map(symbol => ({
+        symbol: symbol,
+        name: symbol,
+        price: "0.00",
+        percent: "0.00%",
+        isDown: false,
+        lastUpdate: null
+      })));
+    } else {
+      setWatchlistItems([]);
+    }
+  }, [userWatchlist]);
+
   // Add symbol functionality
-  const addSymbol = async () => {
-    if (!input.trim()) {
-      console.log("No symbol entered");
-      return;
-    }
 
-    if (!userData?.userId && !userData?._id) {
-      console.error("User not authenticated");
-      return;
-    }
 
-    const symbol = input.toUpperCase();
-    console.log("Adding symbol:", symbol);
-
-    try {
-      const response = await axios.post(
-        `${BACKEND_URL}/api/watchlist/add`,
-        { symbol },
-        { withCredentials: true }
-      );
-
-      console.log("Add symbol response:", response.data);
-
-      // Add to local state if not already present
-      setWatchlist(prev => {
-        const exists = prev.some(item => item.symbol === symbol);
-        if (!exists) {
-          const newItem = {
-            symbol,
-            name: symbol,
-            price: "0.00",
-            percent: "0.00%",
-            isDown: false,
-            lastUpdate: null
-          };
-
-          // Tell socket to subscribe to this symbol
-          if (socketRef.current && isConnected) {
-            socketRef.current.emit("add-symbol", symbol);
-            console.log("Emitted add-symbol event for:", symbol);
-          }
-
-          return [...prev, newItem];
-        }
-        return prev;
-      });
-
-      setInput("");
-    } catch (err) {
-      console.error("Add failed:", err.response?.data || err.message);
-      alert("Failed to add symbol. Please try again.");
+  // Search functionality
+  const searchBox = async () => {
+    if (input.trim()) {
+      try {
+        const res = await axios.get(`${BACKEND_URL}/api/watchlist/search?q=${input}`);
+        setSearch(res.data.result || []);
+      } catch (error) {
+        console.error("Search error:", error);
+        setSearch([]);
+      }
+    } else {
+      setSearch([]);
     }
   };
 
@@ -217,8 +208,8 @@ function WatchList() {
 
       console.log("Remove symbol response:", response.data);
 
-      // Remove from local state
-      setWatchlist(prev => prev.filter(item => item.symbol !== symbol));
+      // Remove from context state
+      removeUserWatchlist(symbol);
 
       // Tell socket to unsubscribe from this symbol
       if (socketRef.current && isConnected) {
@@ -231,23 +222,15 @@ function WatchList() {
     }
   };
 
-  // Handle Enter key press in search input
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      addSymbol();
-    }
-  };
+
 
   // Prepare chart data only if we have watchlist items
-  const chartData = watchlist.length > 0 ? {
-    labels: watchlist.map((item) => item.symbol),
+  const chartData = (userWatchlist && Array.isArray(userWatchlist) && userWatchlist.length > 0) ? {
+    labels: userWatchlist.map((item) => item),
     datasets: [
       {
         label: "Price",
-        data: watchlist.map((stock) => {
-          const price = parseFloat(stock.price);
-          return isNaN(price) ? 0 : Math.max(price, 0.01); // Ensure positive values for chart
-        }),
+        data: userWatchlist.map((stock, index) => Math.max(index + 1, 0.01)), // Simple data since we don't have prices in context
         backgroundColor: [
           "rgba(46, 204, 113, 0.75)",  // green
           "rgba(52, 152, 219, 0.75)",  // blue
@@ -255,7 +238,7 @@ function WatchList() {
           "rgba(231, 76, 60, 0.75)",   // red
           "rgba(155, 89, 182, 0.75)",  // purple
           "rgba(26, 188, 156, 0.75)",  // teal
-        ].slice(0, watchlist.length), // Limit colors to number of items
+        ].slice(0, userWatchlist.length), // Limit colors to number of items
         borderColor: [
           "rgba(46, 204, 113, 1)",
           "rgba(52, 152, 219, 1)",
@@ -263,7 +246,7 @@ function WatchList() {
           "rgba(231, 76, 60, 1)",
           "rgba(155, 89, 182, 1)",
           "rgba(26, 188, 156, 1)",
-        ].slice(0, watchlist.length), // Limit colors to number of items
+        ].slice(0, userWatchlist.length), // Limit colors to number of items
         borderWidth: 2,
         hoverOffset: 12,
       },
@@ -282,22 +265,35 @@ function WatchList() {
             placeholder="Search eg: AAPL, BTCUSDT, ETH"
             className="search-input-field"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onChange={(e) => {
+              setInput(e.target.value);
+              searchBox();
+            }}
+            onBlur={() => {
+              setTimeout(() => {
+                setSearch([]);
+              }, 150); // delay so user can click dropdown items
+            }}
+
           />
         </div>
-        <button onClick={addSymbol} className="search-add-btn">
-          Add
-        </button>
+
       </div>
 
+      {/* Display search results when available */}
+      {search.length > 0 && (
+        <div className="search-results">
+          <SearchElements data={search} />
+        </div>
+      )}
+
       <ul className="list">
-        {watchlist.length === 0 ? (
+        {(!watchlistItems || watchlistItems.length === 0) ? (
           <p style={{ padding: '20px', textAlign: 'center' }}>
             No stocks in watchlist. Add some to get started!
           </p>
         ) : (
-          watchlist.map((stock, index) => (
+          watchlistItems.map((stock, index) => (
             <WatchListItem
               stock={stock}
               key={stock.symbol || index}
@@ -307,8 +303,6 @@ function WatchList() {
           ))
         )}
       </ul>
-
-
 
       {chartData && <DoughnutChart data={chartData} />}
     </div>

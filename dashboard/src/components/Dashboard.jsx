@@ -15,6 +15,7 @@ import { GeneralContextProvider } from "./GeneralContext";
 import { UserContext } from "./userContext";
 import { Navigate } from "react-router-dom";
 import { showToast } from "./toast.jsx";
+import StockPage from "./StockPage.jsx";
  
  
  
@@ -42,23 +43,22 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      
         <GeneralContextProvider>
           <WatchList />
+
+          <div className="content">
+            <Routes>
+              <Route exact path="/" element={<Summary />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/holdings" element={<Holdings />} />
+              <Route path="/positions" element={<Positions />} />
+              <Route path="/funds" element={<Funds />} />
+              <Route path="/apps" element={<Apps />} />
+              <Route path="/verifyAccount" element={userData === null || userData.isVerified ? (<Navigate to="/" replace />) : (<VerifyAccount />)} />
+              <Route path="/stock" element={<StockPage />} />
+            </Routes>
+          </div>
         </GeneralContextProvider>
-       
-      <div className="content">
-        <Routes>
-          <Route exact path="/" element={<Summary />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/holdings" element={<Holdings />} />
-          <Route path="/positions" element={<Positions />} />
-          <Route path="/funds" element={<Funds />} />
-          <Route path="/apps" element={<Apps />} />
-          <Route path="/verifyAccount" element={userData === null || userData.isVerified ? (<Navigate to="/" replace />) : (<VerifyAccount />)} />
-      
-        </Routes>
-      </div>
     </div>
   );
 };

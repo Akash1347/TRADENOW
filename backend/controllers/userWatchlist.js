@@ -1,7 +1,7 @@
  
 const User = require("../model/UsersModel");
 const Watchlist = require("../model/WatchListModel")
-
+const axios = require("axios");
 
 module.exports.addwatchlist = async(req ,res)=> {
     const userId = req.userId;
@@ -53,3 +53,22 @@ module.exports.sendWatchlist = async (req, res) => {
     });
   }
 }
+
+
+module.exports.search = async (req, res) => {
+  try {
+    console.log("query:", req.query);
+    console.log("api key:", process.env.FINNHUB_API_KEY);
+
+    const response = await axios.get(
+      `https://finnhub.io/api/v1/search?q=${req.query.q}&token=${process.env.FINNHUB_API_KEY}`
+    );
+
+    console.log("finnhub data:", response.data);
+
+    res.json(response.data);
+  } catch (error) {
+    console.log("ERROR >>>", error?.response?.data || error.message);
+    res.status(500).json({ error: error?.message });
+  }
+};

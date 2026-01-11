@@ -1,0 +1,32 @@
+ 
+.search-list {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+ 
+.search-item {
+  border-radius: 8px;
+  padding: 12px 14px !important;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  border: 1px solid transparent;
+}
+ 
+.search-item:hover {
+  background-color: #f3f4f6;     
+  border-color: #e2e3e5;          
+  transform: translateX(4px);     
+}
+ 
+.search-item + .search-item {
+  border-top: 1px solid #f1f1f1;
+}
+ 
+.search-item p {
+  font-size: 15px;
+  color: #2d2d2d;
+}

@@ -7,6 +7,26 @@ export function UserContextProvider({ children }) {
   const backend_url = import.meta.env.VITE_BACKEND_URL;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [userWatchlist, setUserWatchlist] = useState([]);
+  const [watchlistLoading, setWatchlistLoading] = useState(false);
+
+  const loadUserWatchlist = async () => {
+    if (!userData?.email) return;
+
+    setWatchlistLoading(true);
+    try {
+      const response = await axios.get(`${backend_url}/api/watchlist/${userData.email}`);
+      if (response.data && Array.isArray(response.data)) {
+        const symbols = response.data.map(item => item.symbol);
+        setUserWatchlist(symbols);
+        console.log("Loaded watchlist:", symbols);
+      }
+    } catch (error) {
+      console.error("Error loading watchlist:", error);
+    } finally {
+      setWatchlistLoading(false);
+    }
+  };
 
   const getUserData = async () => {
     try {
@@ -17,11 +37,28 @@ export function UserContextProvider({ children }) {
 
       if (data.success) {
         setUserData(data.user || data.userData);
+        // Load watchlist after user data is set
+        loadUserWatchlist();
       }
     } catch {
       setUserData(null);
     }
   };
+
+  const addUserWatchlist = (symbol) => {
+    setUserWatchlist((prevWatchlist) => {
+      if (!prevWatchlist.includes(symbol)) {
+        return [...prevWatchlist, symbol];
+      }
+      return prevWatchlist;
+    });
+  };
+
+  const removeUserWatchlist = (symbol) => {
+    setUserWatchlist((prevWatchlist) =>
+      prevWatchlist.filter((item) => item !== symbol)
+    );
+  }
 
   const getAuthState = async () => {
     try {
@@ -56,8 +93,15 @@ export function UserContextProvider({ children }) {
     getAuthState();
   }, []);
 
+  // Load watchlist when userData is available
+  useEffect(() => {
+    if (userData?.email) {
+      loadUserWatchlist();
+    }
+  }, [userData?.email]);
+
   return (
-    <UserContext.Provider value={{ isLoggedIn, userData ,setIsLoggedIn}}>
+    <UserContext.Provider value={{ isLoggedIn, userData, setIsLoggedIn, setUserData, userWatchlist, watchlistLoading, addUserWatchlist, removeUserWatchlist }}>
       {children}
     </UserContext.Provider>
   );

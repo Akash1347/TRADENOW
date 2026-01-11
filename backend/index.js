@@ -26,6 +26,7 @@ const authRoute = require("./routes/AuthRoutes");
 const buyAndSellRoute = require("./routes/BuyAndSellRoute");
 const watchlistRoute = require("./routes/WatchlistRoute");
 const holdingsAndPositionsRoute = require("./routes/HoldingsAndPositionsRoute");
+const chartRoute = require("./routes/ChartRoute");
 
 
 const cookieParser = require("cookie-parser");
@@ -93,6 +94,7 @@ app.use('/api/auth', authRoute);
 app.use('/api/watchlist', watchlistRoute);
 app.use('/api/order', buyAndSellRoute);
 app.use('/api/getdata', holdingsAndPositionsRoute);
+app.use('/api/chart',  chartRoute);
 
 initSocket(server);
 server.listen(PORT, () => {
