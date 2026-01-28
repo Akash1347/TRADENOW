@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 
 function Profile(){
-    const {isLoggedIn ,userData ,setIsLoggedIn} = useContext(UserContext);
+    const {isLoggedIn ,userData ,setIsLoggedIn, setUserData, setUserWatchlist} = useContext(UserContext);
     const navigate = useNavigate();
     const backend_url = import.meta.env.VITE_BACKEND_URL;
     const handleVerify = ()=> {
@@ -19,25 +19,35 @@ function Profile(){
         }
     }
     const handleLogOut = async () => {
-    try {
-        await axios.post(
-        `${backend_url}api/auth/logout`,
-        {},
-        { withCredentials: true }
-        );
-    } catch {
-        // ignore backend failure
-    } finally {
-        setIsLoggedIn(false);
-        localStorage.removeItem("isLoggedIn");
-        toast.success("Logged out");
-        navigate("/");
-    }
+        try {
+            // Try to logout from backend
+            await axios.post(
+                `${backend_url}/api/auth/logout`,
+                {},
+                { 
+                    withCredentials: true,
+                    timeout: 5000
+                }
+            );
+        } catch (error) {
+            // Even if backend logout fails, still clear frontend state
+            console.warn("Backend logout failed, but clearing frontend state:", error);
+        } finally {
+            // Always clear all user data on logout
+            setIsLoggedIn(false);
+            setUserData(null);
+            setUserWatchlist([]);
+            localStorage.removeItem("isLoggedIn");
+            // Also clear any other potential localStorage items
+            localStorage.removeItem("userEmail");
+            localStorage.removeItem("userToken");
+            toast.success("Logged out successfully");
+            navigate("/");
+        }
     };
     const handleLogIn = ()=> {
-        window.location.replace(import.meta.env.VITE_FRONTEND_URL + 'signup');
-
-    }
+        window.location.replace(import.meta.env.VITE_FRONTEND_URL + 'login');
+    };
 
     return(
        <div className="profile-dropdown">

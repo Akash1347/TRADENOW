@@ -22,7 +22,6 @@ const addHoldingsForNewUser = async (userId) => {
 
         }
         await HoldingsModel.create(data);
-        console.log("Holdings added for new user");
     }
 }
 const addWallet = async (userId) => {
@@ -153,15 +152,30 @@ module.exports.login = async (req, res) => {
 
 module.exports.logout = (req, res) => {
     try {
+        // Clear cookie with explicit path and domain settings
         res.clearCookie("token", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
-        })
-        return res.json({ success: true, message: "Logged Out" })
-    } catch (err) {
-        return res.json({ success: false, message: err.message });
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            path: "/",
+            domain: process.env.NODE_ENV === "production" ? undefined : undefined
+        });
 
+        // Also clear any potential variations of the cookie
+        res.clearCookie("token", { path: "/" });
+        res.clearCookie("token", { path: "/api" });
+        res.clearCookie("token", { path: "/dashboard" });
+        res.clearCookie("token", { path: "/frontend" });
+
+        // Set response headers to prevent caching
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+
+        return res.json({ success: true, message: "Logged Out Successfully" });
+    } catch (err) {
+        console.error("Logout error:", err);
+        return res.status(500).json({ success: false, message: "Logout failed" });
     }
 };
 
@@ -191,7 +205,6 @@ module.exports.sendVerificationCode = async (req, res) => {
             { new: true }
         );
 
-        console.log(updatedInfo);
         await sendEmail(
             updatedInfo.email,
             "Account Verification OTP",
@@ -246,8 +259,6 @@ module.exports.verifyAccount = async (req, res) => {
             { new: true }
         );
 
-        console.log(updatedInfo);
-
         return res.json({ success: true, message: "Email Verified Successfully" });
 
     } catch (err) {
@@ -258,7 +269,6 @@ module.exports.verifyAccount = async (req, res) => {
 
 module.exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
-    console.log(email);
 
     if (!email) {
         return res.json({ success: false, message: "Invalid Details" });
@@ -282,8 +292,6 @@ module.exports.forgotPassword = async (req, res) => {
             },
             { new: true }
         );
-
-        console.log(updatedUser);
 
         await sendEmail(
             email,
@@ -311,7 +319,6 @@ module.exports.forgotPassword = async (req, res) => {
 
 module.exports.resetPassword = async (req, res) => {
     const { email, otp, newPassword } = req.body;
-    console.log(req.body);
 
     if (!email || !otp || !newPassword) {
         return res.json({ success: false, message: "Fill All Details" });
@@ -343,8 +350,6 @@ module.exports.resetPassword = async (req, res) => {
             },
             { new: true }
         );
-
-        console.log(updatedUser);
 
         return res.json({ success: true, message: "Password has been updated" });
 

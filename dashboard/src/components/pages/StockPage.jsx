@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import CandleChart from '../charts/CandleChart';
 import AddWatchlistButton from '../watchlist/AddWatchlistButton';
 import GeneralContext from '../../contexts/GeneralContext';
+import { UserContext } from '../../contexts/userContext';
 import './StockPage.css';
 
 function StockPage() {
@@ -15,9 +17,9 @@ function StockPage() {
     const [companyData, setCompanyData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const { userData, isLoggedIn } = useContext(UserContext);
     const generalContext = useContext(GeneralContext);
-
+     
     // Function to check if US market is open
     const isMarketOpen = () => {
         const now = new Date();
@@ -127,7 +129,21 @@ function StockPage() {
     if (!symbol) {
         return <div className="stock-page-error">No stock symbol provided.</div>;
     }
+    const navigate = useNavigate();
 
+    const buyWindow = () => {
+        if (isLoggedIn === false) {
+            window.location.href = `${import.meta.env.VITE_FRONTEND_URL}/login`;
+            return;
+        }
+        if (userData && userData.isVerified === false) {
+            navigate('/verifyAccount');
+            return;
+        }
+        if (generalContext?.openBuyWindow) {
+            generalContext.openBuyWindow(symbol, companyData?.regularMarketPrice || 0);
+        }
+    }
     const marketOpen = isMarketOpen();
     const nextOpening = getNextMarketOpening();
 
@@ -167,7 +183,7 @@ function StockPage() {
 
             <div className="stock-actions">
                 <button
-                    onClick={() => generalContext?.openBuyWindow && generalContext.openBuyWindow(symbol, companyData?.regularMarketPrice || 0)}
+                    onClick={buyWindow}
                     disabled={!companyData || !marketOpen || !generalContext?.openBuyWindow}
                     title={!marketOpen ? "Market is closed" : ""}
                 >

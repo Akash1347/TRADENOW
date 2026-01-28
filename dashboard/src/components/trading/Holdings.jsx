@@ -15,7 +15,6 @@ const Holdings = () => {
         console.error("Failed to fetch holdings:", res.data.message);
         return;
       }
-      console.log("API Response:", res.data.data);
       setAllHoldings(res.data.data);
     }).catch((error) => {
       console.error("Error fetching holdings:", error);

@@ -36,6 +36,9 @@ function Navbar() {
             <ul className="navbar-nav mb-lg-0">
 
               <li className="nav-item ms-3" id="nav_custom_hover">
+                {/* <NavLink className="nav-link" to="/login">
+                  Login
+                </NavLink> */}
                 <NavLink className="nav-link" to="/signup">
                   Signup
                 </NavLink>

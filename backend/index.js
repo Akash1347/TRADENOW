@@ -55,9 +55,7 @@ app.get('/', (req, res) => {
  
 
 app.get('/allpositions', async (req, res) => {
-
     const allPosition = await PositionsModel.find({});
-    console.log(allPosition);
     res.json(allPosition);
 })
 
@@ -65,12 +63,9 @@ app.get('/allpositions', async (req, res) => {
 
 
 app.post('/addorder', async (req, res) => {
-
     const data = req.body;
     let order = await OrdersModel.insertOne(data);
-    console.log(order);
     res.json({ message: "Order saved", status: "success" });
-
 });
 
 app.post('/watchlist', userAuth, async (req, res) => {
@@ -80,7 +75,6 @@ app.post('/watchlist', userAuth, async (req, res) => {
         symbol: item.name
     }));
     const data = await Watchlist.insertMany(filteredData);
-    console.log(data);
     res.json({ message: "Watchlist saved", status: "success" });
 })
 

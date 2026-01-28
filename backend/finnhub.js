@@ -22,7 +22,6 @@ module.exports.connectFinnhub = function (onTrade) {
   finnhubWS.on("message", (msg) => {
     const data = JSON.parse(msg.toString());
     if (data.type === "trade") {
-      console.log("Received trade data:", data.data.length, "trades");
       onTrade(data.data);
     } else {
       console.log("Received non-trade message:", data);

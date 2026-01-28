@@ -3,8 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-function Signup() {
-  const [username, setUserName] = useState("");
+function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const backend_url = import.meta.env.VITE_BACKEND_URL;
@@ -15,44 +14,33 @@ function Signup() {
 
     try {
       const response = await axios.post(
-        backend_url + 'api/auth/signin',
-        { username, email, password },
+        backend_url + 'api/auth/login',
+        { email, password },
         { withCredentials: true }
       );
 
       if (response.data.success) {
         localStorage.setItem('isLoggedIn', 'true');
-        toast.success("Account created successfully");
+        toast.success("Logged in successfully");
         window.location.replace(import.meta.env.VITE_DASHBOARD_URL);
       } else {
-        toast.error(response.data.message || "Signup failed");
+        toast.error(response.data.message || "Login failed");
       }
     } catch (error) {
-      toast.error("Signup failed. Please try again.");
+      toast.error("Login failed. Please try again.");
     }
   };
 
-  const handleLogin = () => {
-    navigate('/login');
+  const handleForgot = () => {
+    navigate('/forgotpassword');
   };
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="card shadow p-4" style={{ width: "400px", marginBottom: "110px", height: "460px" }}>
-        <h3 className="text-center mb-4">Create Account</h3>
+      <div className="card shadow p-4" style={{ width: "400px", marginBottom: "110px", height: "420px" }}>
+        <h3 className="text-center mb-4">Log In</h3>
 
         <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Enter your name"
-              value={username}
-              onChange={(e) => setUserName(e.target.value)}
-              required
-            />
-          </div>
-
           <div className="mb-3">
             <input
               type="email"
@@ -77,19 +65,29 @@ function Signup() {
 
           <div className="text-center mb-3">
             <p className="text-muted mb-0 mt-2">
-              Already have an account?{" "}
+              Don't have an account?{" "}
               <span
                 className="text-primary fw-semibold"
                 role="button"
-                onClick={handleLogin}
+                onClick={() => navigate('/signup')}
               >
-                Log In
+                Sign Up
+              </span>
+            </p>
+            <p className="text-muted mb-0 mt-2">
+              Forgot your password?{" "}
+              <span
+                className="text-primary fw-semibold"
+                role="button"
+                onClick={handleForgot}
+              >
+                Reset here
               </span>
             </p>
           </div>
 
           <button type="submit" className="btn btn-primary w-100">
-            Sign Up
+            Log In
           </button>
         </form>
       </div>
@@ -97,4 +95,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default Login;

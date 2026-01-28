@@ -45,37 +45,31 @@ function WatchList() {
   useEffect(() => {
     // Make sure we have a userId before connecting
     if (!userData?.userId) {
-      console.log("No userId available, cannot establish socket connection");
       return;
     }
 
     const userId = userData.userId;
-    console.log("Connecting to socket with userId:", userId);
 
     // Establish socket connection
     socketRef.current = io(BACKEND_URL, {
-      query: { userId: userId }  // ✅ Now sending userId as backend expects
+      query: { userId: userId }
     });
 
     // Connection successful
     socketRef.current.on("connect", () => {
-      console.log("Socket connected successfully:", socketRef.current.id);
       setIsConnected(true);
     });
 
     // Connection error
     socketRef.current.on("connect_error", (error) => {
-      console.error("Socket connection error:", error);
       setIsConnected(false);
     });
 
     // Listen for price updates
     socketRef.current.on("price-update", (trade) => {
-      console.log("Received price update:", trade);
 
       setWatchlistItems((currentList) => {
         if (!Array.isArray(currentList)) {
-          console.warn("currentList is not an array:", currentList);
           return currentList;
         }
 
@@ -104,7 +98,6 @@ function WatchList() {
 
     // Cleanup on unmount or userId change
     return () => {
-      console.log("Cleaning up socket connection");
       socketRef.current?.disconnect();
       setIsConnected(false);
     };
@@ -113,23 +106,13 @@ function WatchList() {
   // Function to fetch watchlist data
   const fetchWatchlist = async () => {
     if (!userData?.email) {
-      console.log("No email, skipping watchlist fetch");
+
       return;
     }
 
     try {
       const response = await axios.get(`${BACKEND_URL}/api/watchlist/${userData.email}`);
-
-      console.log("Watchlist response:", response.data);
-
-      if (response.data && Array.isArray(response.data)) {
-        console.log("Watchlist fetched successfully:", response.data.length, "items");
-        // Note: We don't set local state here anymore - context handles it
-      } else if (response.data && response.data.success === false) {
-        console.error("Auth error:", response.data.message);
-      }
     } catch (err) {
-      console.error("Error fetching watchlist:", err);
       if (err.response?.status === 401) {
         console.error("Authentication required");
       }
@@ -145,7 +128,7 @@ function WatchList() {
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === 'watchlist-updated') {
-        console.log("Watchlist updated, refreshing...");
+
         fetchWatchlist();
       }
     };
@@ -180,7 +163,7 @@ function WatchList() {
         const res = await axios.get(`${BACKEND_URL}/api/watchlist/search?q=${input}`);
         setSearch(res.data.result || []);
       } catch (error) {
-        console.error("Search error:", error);
+
         setSearch([]);
       }
     } else {
@@ -190,15 +173,12 @@ function WatchList() {
 
   // Remove symbol functionality
   const removeSymbol = async (symbol) => {
-    console.log("removeSymbol called with:", symbol);
-    console.log("userData:", userData);
+
 
     if (!userData?.userId && !userData?._id) {
-      console.error("User not authenticated");
       return;
     }
 
-    console.log("Proceeding with removal of:", symbol);
 
     try {
       const response = await axios.delete(`${BACKEND_URL}/api/watchlist/`, {
@@ -206,23 +186,17 @@ function WatchList() {
         withCredentials: true
       });
 
-      console.log("Remove symbol response:", response.data);
-
-      // Remove from context state
       removeUserWatchlist(symbol);
 
       // Tell socket to unsubscribe from this symbol
       if (socketRef.current && isConnected) {
         socketRef.current.emit("remove-symbol", symbol);
-        console.log("Emitted remove-symbol event for:", symbol);
+
       }
     } catch (err) {
-      console.error("Remove failed:", err.response?.data || err.message);
       alert("Failed to remove symbol. Please try again.");
     }
   };
-
-
 
   // Prepare chart data only if we have watchlist items
   const chartData = (userWatchlist && Array.isArray(userWatchlist) && userWatchlist.length > 0) ? {

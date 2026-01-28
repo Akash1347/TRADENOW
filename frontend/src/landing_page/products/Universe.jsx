@@ -59,8 +59,8 @@ function Universe() {
 
      
       <div className="mt-4">
-        <NavLink to="/signup" className="btn btn-primary px-4 py-2">
-          Sign up for free
+        <NavLink to="/login" className="btn btn-primary px-4 py-2">
+          Login
         </NavLink>
       </div>
 

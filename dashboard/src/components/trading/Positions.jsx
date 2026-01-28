@@ -8,8 +8,6 @@ const Positions = () => {
 
   useEffect(() => {
     axios.get(backendUrl + "/allpositions").then((res) => {
-      console.log("API Response:", res.data);
-
       setAllPositions(res.data);
     }).catch((error) => {
       console.error("Error fetching holdings:", error);
