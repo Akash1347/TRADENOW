@@ -17,9 +17,12 @@ function StockPage() {
     const [companyData, setCompanyData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { userData, isLoggedIn } = useContext(UserContext);
+    const { userData, isLoggedIn, orderHistory } = useContext(UserContext);
     const generalContext = useContext(GeneralContext);
      
+    const numOfStocks = orderHistory
+    .filter(order => order.symbol === symbol)
+    .reduce((total, order) => total + (order.side === 'BUY' ? order.quantity : -order.quantity), 0);
     // Function to check if US market is open
     const isMarketOpen = () => {
         const now = new Date();
@@ -144,6 +147,20 @@ function StockPage() {
             generalContext.openBuyWindow(symbol, companyData?.regularMarketPrice || 0);
         }
     }
+
+    const sellWindow = () => {
+        if (isLoggedIn === false) {
+            window.location.href = `${import.meta.env.VITE_FRONTEND_URL}/login`;
+            return;
+        }
+        if (userData && userData.isVerified === false) {
+            navigate('/verifyAccount');
+            return;
+        }
+        if (generalContext?.openSellWindow) {
+            generalContext.openSellWindow(symbol, companyData?.regularMarketPrice || 0, numOfStocks);
+        }
+    }
     const marketOpen = isMarketOpen();
     const nextOpening = getNextMarketOpening();
 
@@ -189,13 +206,18 @@ function StockPage() {
                 >
                     BUY
                 </button>
-                <button
-                    onClick={() => generalContext?.openSellWindow && generalContext.openSellWindow(symbol, companyData?.regularMarketPrice || 0)}
-                    disabled={!companyData || !marketOpen || !generalContext?.openSellWindow}
-                    title={!marketOpen ? "Market is closed" : ""}
-                >
-                    SELL
-                </button>
+
+                {
+                    numOfStocks > 0 && (
+                        <button
+                            onClick={sellWindow}
+                            disabled={!companyData || !marketOpen || !generalContext?.openSellWindow}
+                            title={!marketOpen ? "Market is closed" : ""}
+                        >
+                            SELL
+                        </button>
+                    )
+                }
                 <AddWatchlistButton symbol={symbol} />
             </div>
             {loading && (

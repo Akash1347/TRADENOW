@@ -20,6 +20,7 @@ export const GeneralContextProvider = (props) => {
     const [selectedStockUID, setSelectedStockUID] = useState("");
     const [ischartOpen, setChart] = useState(false);
     const [selectedStockPrice, setSelectedStockPrice] = useState(0.0);
+    const [sellMaxQuantity, setSellMaxQuantity] = useState(null);
 
 
 
@@ -32,10 +33,11 @@ export const GeneralContextProvider = (props) => {
         setSelectedStockUID("");
         setBuyWindowOpen(false);
     }
-    const handleOpenSellWindow = (uid, price) => {
+    const handleOpenSellWindow = (uid, price, maxQuantity) => {
         setSelectedStockPrice(price);
         setSellWindowOpen(true);
         setSelectedStockUID(uid);
+        setSellMaxQuantity(maxQuantity);
     }
     const handleCloseSellWindow = () => {
         setSelectedStockUID("");
@@ -62,7 +64,7 @@ export const GeneralContextProvider = (props) => {
             }}>
             {props.children}
             {isBuyWindowOpen && <BuyActionWindow uid={selectedStockUID} price={selectedStockPrice} />}
-            {isSellWindowOpen && <SellActionWindow uid={selectedStockUID} price={selectedStockPrice} />}
+            {isSellWindowOpen && <SellActionWindow uid={selectedStockUID} price={selectedStockPrice} maxQuantity={sellMaxQuantity} />}
             {ischartOpen && <StockPriceChart symbol={selectedStockUID} />}
         </GeneralContext.Provider>
     )

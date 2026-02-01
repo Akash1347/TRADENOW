@@ -5,7 +5,7 @@ import { showToast } from "../ui/toast.jsx";
 
 import "./BuyActionWindow.css";
 
-const SellActionWindow = ({ uid, price }) => {
+const SellActionWindow = ({ uid, price, maxQuantity }) => {
   const { closeSellWindow } = useContext(GeneralContext);
 
   const [stockQuantity, setStockQuantity] = useState(1);
@@ -70,8 +70,15 @@ const SellActionWindow = ({ uid, price }) => {
               id="qty"
               onChange={(e) => setStockQuantity(e.target.value)}
               value={stockQuantity}
+              min="1"
+              max={maxQuantity || stockQuantity}
               required
             />
+            {maxQuantity !== undefined && maxQuantity !== null && maxQuantity !== '' && (
+              <small style={{ color: '#666', display: 'block', marginTop: '4px' }}>
+                Max available: {maxQuantity} shares
+              </small>
+            )}
           </fieldset>
           <input
             type="radio"

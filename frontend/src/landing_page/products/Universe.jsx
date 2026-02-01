@@ -5,7 +5,7 @@ function Universe() {
   return (
     <div className="container mt-5 mb-5 text-center">
  
-      <h3 className="my-4">The Zerodha Universe</h3>
+      <h3 className="my-4">The TradeNow Universe</h3>
       <p className="text-muted">
         Extend your trading and investment experience even further with our partner platforms
       </p>
@@ -13,7 +13,7 @@ function Universe() {
       <div className="row justify-content-center">
  
         <div className="col-md-4 p-4">
-          <img src="/media/images/zerodhaFundHouse.png" style={{ width: "40%" }} alt="" />
+          <img src="/media/images/tradenowFundhouse.png" style={{ width: "40%" }} alt="" />
           <p className="text-muted small mt-3">
             Our asset management venture that is creating simple and transparent index funds
             to help you save for your goals.

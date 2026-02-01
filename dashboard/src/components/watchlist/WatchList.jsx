@@ -11,7 +11,7 @@ import SearchElements from "../ui/SearchElements.jsx";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 function WatchList() {
-  const { userData, userWatchlist, removeUserWatchlist } = useContext(UserContext);
+  const { userData, userWatchlist, removeUserWatchlist, orderHistory } = useContext(UserContext);
   const generalContext = useContext(GeneralContext);
   const [input, setInput] = useState("");
   const socketRef = useRef(null);
@@ -153,6 +153,31 @@ function WatchList() {
     }
   }, [userWatchlist]);
 
+  // Function to check if user owns a specific stock
+  const getUserStockQuantity = async (symbol) => {
+    try {
+      // Fetch actual holdings from backend instead of calculating from order history
+      const response = await axios.get(`${BACKEND_URL}/api/getdata/holdings`, {
+        withCredentials: true
+      });
+      
+      if (response.data.success && response.data.data) {
+        const holdings = response.data.data;
+        const holding = holdings.find(h => h.symbol === symbol);
+        
+        if (holding) {
+          // Calculate available quantity (total - blocked)
+          const availableQty = holding.quantity - holding.blockedQty;
+          return availableQty;
+        }
+      }
+      
+      return 0;
+    } catch (error) {
+      return 0;
+    }
+  };
+
   // Add symbol functionality
 
 
@@ -273,6 +298,7 @@ function WatchList() {
               key={stock.symbol || index}
               onRemove={() => removeSymbol(stock.symbol)}
               isMarketOpen={isMarketOpen()}
+              getUserStockQuantity={getUserStockQuantity}
             />
           ))
         )}

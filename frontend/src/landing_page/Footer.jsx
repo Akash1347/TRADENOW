@@ -63,7 +63,7 @@ function Footer() {
             #153/154, 4th Cross, Dollars Colony, Opp. Clarence Public School,
             J.P Nagar 4th Phase, Bengaluru - 560078, Karnataka, India. For any
             complaints pertaining to securities broking please write to
-            complaints@zerodha.com, for DP related to dp@zerodha.com. Please
+            complaints@tradenow.com, for DP related to dp@tradenow.com. Please
             ensure you carefully read the Risk Disclosure Document as prescribed
             by SEBI | ICF
           </p>

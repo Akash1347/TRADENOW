@@ -11,7 +11,7 @@ function Navbar() {
 
         <NavLink className="navbar-brand" to="/">
           <img
-            src="/media/images/logo.svg"
+            src="/media/images/logo.png"
             style={{ width: "25%" }}
             alt="Logo"
           />

@@ -3,7 +3,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import WatchListAction from "./WatchListAction";
 
-function WatchListItem({ stock, onRemove, isMarketOpen }) {
+function WatchListItem({ stock, onRemove, isMarketOpen, getUserStockQuantity }) {
   const [showWatchlistAction, setShowWatchlistAction] = useState(false);
   const [hideTimeout, setHideTimeout] = useState(null);
 
@@ -46,7 +46,13 @@ function WatchListItem({ stock, onRemove, isMarketOpen }) {
         </div>
       </div>
       {showWatchlistAction && (
-        <WatchListAction uid={stock.name} price={stock.price} onRemove={onRemove} />
+        <WatchListAction 
+          uid={stock.name} 
+          price={stock.price} 
+          onRemove={onRemove} 
+          isMarketOpen={isMarketOpen}
+          getUserStockQuantity={getUserStockQuantity}
+        />
       )}
     </li>
   );

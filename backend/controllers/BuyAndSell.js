@@ -285,7 +285,6 @@ module.exports.placeSellOrder = async (req, res) => {
 
     // First check if user has sufficient holdings
     const holding = await HoldingsModel.findOne({ userId, symbol: upperSymbol });
-    console.log("Current Holding:", holding);
     const availableQty = holding ? (holding.quantity - holding.blockedQty) : 0;
 
     if (!holding || availableQty < quantity) {
