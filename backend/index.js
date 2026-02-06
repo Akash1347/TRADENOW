@@ -51,6 +51,9 @@ mongoose.connect(url)
 app.get('/', (req, res) => {
     res.send("hello");
 })
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
 
  
 

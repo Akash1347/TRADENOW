@@ -2,7 +2,13 @@ const WebSocket = require("ws");
 
 let finnhubWS = null;
 let isConnecting = false;
+
+// Track subscriptions so we can re-subscribe after reconnect
 const subscriptions = new Set();
+
+// Reconnect backoff
+let retryDelay = 5000;           // start with 5 seconds
+const MAX_DELAY = 60000;         // max 60 seconds
 
 function connectFinnhub(onTrade) {
   if (isConnecting || (finnhubWS && finnhubWS.readyState === WebSocket.OPEN)) {
@@ -19,8 +25,9 @@ function connectFinnhub(onTrade) {
   finnhubWS.on("open", () => {
     console.log("Finnhub WebSocket connected");
     isConnecting = false;
+    retryDelay = 5000; // reset backoff on success
 
-    // Re-subscribe all symbols after reconnect
+    // Re-subscribe to all symbols after reconnect
     for (const symbol of subscriptions) {
       finnhubWS.send(JSON.stringify({ type: "subscribe", symbol }));
     }
@@ -33,22 +40,33 @@ function connectFinnhub(onTrade) {
         onTrade(data.data);
       }
     } catch (err) {
-      console.error("Failed to parse Finnhub message:", err);
+      console.error("Failed to parse Finnhub message:", err.message);
     }
   });
 
   finnhubWS.on("close", () => {
-    console.log("Finnhub WebSocket closed. Reconnecting in 5s...");
-    isConnecting = false;
-    finnhubWS = null;
-    setTimeout(() => connectFinnhub(onTrade), 5000);
+    console.log("Finnhub WebSocket closed.");
+    cleanupAndReconnect(onTrade);
   });
 
-  finnhubWS.on("error", (error) => {
-    console.error("Finnhub WebSocket error:", error);
-    // Force close to trigger reconnect
+  finnhubWS.on("error", (err) => {
+    console.error("Finnhub WebSocket error:", err.message);
     try { finnhubWS.close(); } catch {}
   });
+}
+
+function cleanupAndReconnect(onTrade) {
+  isConnecting = false;
+  finnhubWS = null;
+
+  const delay = retryDelay;
+  console.log(`Reconnecting in ${delay / 1000}s...`);
+
+  setTimeout(() => {
+    connectFinnhub(onTrade);
+  }, delay);
+
+  retryDelay = Math.min(retryDelay * 2, MAX_DELAY); // exponential backoff
 }
 
 function subscribeSymbol(symbol) {

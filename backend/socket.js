@@ -1,15 +1,13 @@
 const { Server } = require("socket.io");
 const Watchlist = require("./model/WatchListModel");
-const { initNotifier, notifyUser } = require("./utils/notify");
+const { initNotifier } = require("./utils/notify");
 const {
   connectFinnhub,
   subscribeSymbol,
   unsubscribeSymbol
 } = require("./finnhub");
 
-
 module.exports = function initSocket(server) {
-
   const io = new Server(server, {
     cors: {
       origin: [process.env.DASHBOARD_URL, process.env.FRONTEND_URL],
@@ -17,24 +15,20 @@ module.exports = function initSocket(server) {
     }
   });
 
-
   const activeSymbols = new Set();
   const symbolRefCount = new Map();
   const userSockets = new Map();
 
-
   initNotifier(io);
-
-
 
   io.on("connection", async (socket) => {
     const userId = socket.handshake.query.userId;
-    socket.join(userId); //notification room
 
     if (!userId) {
       return socket.disconnect();
     }
 
+    socket.join(userId); // notification room
     userSockets.set(socket.id, { userId, symbols: new Set() });
 
     try {
@@ -45,6 +39,7 @@ module.exports = function initSocket(server) {
     } catch (err) {
       console.error("Error fetching watchlist for socket:", err);
     }
+
     socket.on("add-symbol", (symbol) => {
       addSymbol(socket, symbol);
     });
@@ -71,7 +66,6 @@ module.exports = function initSocket(server) {
     const count = symbolRefCount.get(symbol) || 0;
     symbolRefCount.set(symbol, count + 1);
 
-
     if (count === 0) {
       if (activeSymbols.size >= 50) {
         console.warn("Reached Finnhub free tier limit (50 symbols)");
@@ -90,7 +84,7 @@ module.exports = function initSocket(server) {
     userData.symbols.delete(symbol);
     socket.leave(symbol);
 
-    const count = symbolRefCount.get(symbol) - 1;
+    const count = (symbolRefCount.get(symbol) || 1) - 1;
     if (count <= 0) {
       symbolRefCount.delete(symbol);
       activeSymbols.delete(symbol);
@@ -110,11 +104,10 @@ module.exports = function initSocket(server) {
     }
   }
 
-
+  // Start Finnhub connection ONCE
   connectFinnhub((trades) => {
     trades.forEach(t => {
-
-      io.to(t.s).emit("price-update", { // emit to symbol room
+      io.to(t.s).emit("price-update", {
         s: t.s,
         p: t.p,
         t: t.t,
