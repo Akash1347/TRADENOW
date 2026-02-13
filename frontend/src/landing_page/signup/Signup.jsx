@@ -78,13 +78,9 @@ function Signup() {
           <div className="text-center mb-3">
             <p className="text-muted mb-0 mt-2">
               Already have an account?{" "}
-              <span
-                className="text-primary fw-semibold"
-                role="button"
-                onClick={handleLogin}
-              >
+              <a href="/login" className="text-primary fw-semibold">
                 Log In
-              </span>
+              </a>
             </p>
           </div>
 

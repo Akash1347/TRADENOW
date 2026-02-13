@@ -16,14 +16,18 @@ function Stats() {
                     <p className="text-muted mb-4">Not just an app, but a whole ecosystem. Our investments in 30+ fintech startups offer you tailored services specific to your needs.</p>
                     <h2 className="fs-4">Do better with money</h2>
                     <p className="text-muted mb-4">With initiatives like Nudge and Kill Switch, we don't just facilitate transactions, but actively help you do better with your money.</p>
+                    <div className="mt-4">
+                        <a href="/product" className="btn btn-outline-primary btn-sm me-3">Explore Our Products</a>
+                        <a href="/support" className="btn btn-outline-primary btn-sm">Get Support</a>
+                    </div>
 
 
                 </div>
                 <div className="col-7">
-                    <img src="/media/images/ecosystem.png" style={{width:"85%"}}></img>
-                     <div className="mt-3">
-                        <a href="" className="p-3 text-decoration-none">Explore our products <i className="fa fa-long-arrow-right" aria-hidden="true"></i></a>
-                        <a href="" className="p-3 text-decoration-none">Try Kite demo <i className="fa fa-long-arrow-right" aria-hidden="true"></i></a>
+                    <img src="/media/images/ecosystem.png" style={{width:"100%", height:"auto", borderRadius:"8px"}} alt="Ecosystem"/>
+                     <div className="mt-4">
+                        <a href="/product" className="btn btn-outline-primary btn-sm me-3">Explore our products <i className="fa fa-long-arrow-right" aria-hidden="true"></i></a>
+                        <a href="/support" className="btn btn-outline-primary btn-sm">Try Kite demo <i className="fa fa-long-arrow-right" aria-hidden="true"></i></a>
                     </div>
                 
                 </div>

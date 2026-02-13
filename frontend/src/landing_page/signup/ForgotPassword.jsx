@@ -119,6 +119,11 @@ function ForgotPassword() {
             </button>
           </form>
         )}
+        <div className="text-center mt-3">
+          <p className="text-muted">
+            Remember your password? <a href="/login" className="text-primary">Login here</a>
+          </p>
+        </div>
       </div>
     </div>
   );

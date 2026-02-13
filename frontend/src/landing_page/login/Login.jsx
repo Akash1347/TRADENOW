@@ -66,23 +66,15 @@ function Login() {
           <div className="text-center mb-3">
             <p className="text-muted mb-0 mt-2">
               Don't have an account?{" "}
-              <span
-                className="text-primary fw-semibold"
-                role="button"
-                onClick={() => navigate('/signup')}
-              >
+              <a href="/signup" className="text-primary fw-semibold">
                 Sign Up
-              </span>
+              </a>
             </p>
             <p className="text-muted mb-0 mt-2">
               Forgot your password?{" "}
-              <span
-                className="text-primary fw-semibold"
-                role="button"
-                onClick={handleForgot}
-              >
+              <a href="/forgotpassword" className="text-primary fw-semibold">
                 Reset here
-              </span>
+              </a>
             </p>
           </div>
 

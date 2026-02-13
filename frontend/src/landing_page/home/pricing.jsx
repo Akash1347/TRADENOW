@@ -9,29 +9,27 @@ function Pricing() {
                     <h2 className='text-muted fs-5'>We pioneered the concept of discount broking and price transparency in India. Flat fees and no hidden charges.</h2>
                 </div>
                 <div className='col-7 mt-5'>
-                    <div className='row '>
-                        <p style={{ fontSize: "10px" }} className='col-4 text-start text-muted'>
-                            <img src='/media/images/Pricing0.svg' style={{ width: "50%" }}></img>
-                            Free account opening
-                        </p>
+                    <div className='row'>
+                        <div className='col-4 text-center'>
+                            <img src='/media/images/Pricing0.svg' style={{ width: "80px", height: "80px", marginBottom: "15px" }} alt="Free account opening"/>
+                            <p className='text-muted' style={{ fontSize: "14px", fontWeight: "500" }}>Free account opening</p>
+                        </div>
 
-                        <p style={{ fontSize: "10px" }} className='col-4 text-muted text-start'>
-                            <img src='/media/images/Pricing0.svg' style={{ width: "50%" }}></img>
-                            Free equity delivery
-                        </p>
-                        <p style={{ fontSize: "10px" }} className='col-4 text-muted'>
-                            <img src='/media/images/intradayTrades.svg' style={{ width: "50%" }}></img>
-                            Intraday and F&O
-                        </p>
+                        <div className='col-4 text-center'>
+                            <img src='/media/images/Pricing0.svg' style={{ width: "80px", height: "80px", marginBottom: "15px" }} alt="Free equity delivery"/>
+                            <p className='text-muted' style={{ fontSize: "14px", fontWeight: "500" }}>Free equity delivery</p>
+                        </div>
+                        
+                        <div className='col-4 text-center'>
+                            <img src='/media/images/intradayTrades.svg' style={{ width: "80px", height: "80px", marginBottom: "15px" }} alt="Intraday and F&O"/>
+                            <p className='text-muted' style={{ fontSize: "14px", fontWeight: "500" }}>Intraday and F&O</p>
+                        </div>
                     </div>
-
-
-
                 </div>
 
 
             </div>
-            <a href="" className=" text-decoration-none ms-5">See pricing<i className="fa fa-long-arrow-right" aria-hidden="true"></i></a>
+            <a href="/pricing" className=" text-decoration-none ms-5">See pricing <i className="fa fa-long-arrow-right" aria-hidden="true"></i></a>
         </div>
     );
 }

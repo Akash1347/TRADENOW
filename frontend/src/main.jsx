@@ -17,6 +17,19 @@ import ForgotPassowrd from './landing_page/signup/ForgotPassword';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Add smooth scroll behavior
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  });
+});
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -43,4 +56,5 @@ root.render(
   </BrowserRouter>
 );
 
+ 
  
