@@ -91,12 +91,12 @@ module.exports.signin = async (req, res) => {
         await addHoldingsForNewUser(data._id);
         await addWallet(data._id);
         await addwatchlistForNewUser(data._id);
-        // Account creation should succeed even if welcome email fails.
-        try {
-            await sendEmail(
-                data.email,
-                "Welcome to TRADENOW",
-                `Hi ${data.username},
+        // Send welcome email in background (non-blocking).
+        // Do not await this; deployment SMTP/network latency must not delay response.
+        sendEmail(
+            data.email,
+            "Welcome to TRADENOW",
+            `Hi ${data.username},
 
                 Your TRADENOW account has been created successfully.
 
@@ -105,11 +105,13 @@ module.exports.signin = async (req, res) => {
                 If this wasn’t you, please ignore this email.
 
                 — Team TRADENOW`
-            );
-        } catch (emailErr) {
+        ).then(() => {
+            console.log("Welcome email sent");
+        }).catch((emailErr) => {
             console.log("Welcome email failed:", emailErr.message);
-        }
+        });
 
+        // Return success immediately so signup/redirect is never blocked by SMTP delays.
         return res.json({ success: true, message: "Registered successfully" });
 
     } catch (err) {
