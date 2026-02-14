@@ -7,28 +7,44 @@ function Signup() {
   const [username, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const backend_url = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     try {
+      const apiBase = backend_url?.endsWith("/") ? backend_url : `${backend_url}/`;
       const response = await axios.post(
-        backend_url + 'api/auth/signin',
+        apiBase + 'api/auth/signin',
         { username, email, password },
         { withCredentials: true }
       );
 
       if (response.data.success) {
         localStorage.setItem('isLoggedIn', 'true');
-        toast.success("Account created successfully");
-        window.location.replace(import.meta.env.VITE_DASHBOARD_URL);
+        toast.success(response.data.message || "Account created successfully");
+
+        setTimeout(() => {
+          const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL;
+          if (dashboardUrl) {
+            window.location.assign(dashboardUrl);
+          } else {
+            navigate('/login');
+          }
+        }, 1000);
       } else {
         toast.error(response.data.message || "Signup failed");
       }
     } catch (error) {
-      toast.error("Signup failed. Please try again.");
+      const message = error?.response?.data?.message || "Signup failed. Please try again.";
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -57,7 +73,7 @@ function Signup() {
             <input
               type="email"
               className="form-control"
-              placeholder="abc@gmail.com"
+              placeholder="abc@gmail.com enter a valid email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -84,8 +100,8 @@ function Signup() {
             </p>
           </div>
 
-          <button type="submit" className="btn btn-primary w-100">
-            Sign Up
+          <button type="submit" className="btn btn-primary w-100" disabled={isSubmitting}>
+            {isSubmitting ? "Creating account..." : "Sign Up"}
           </button>
         </form>
       </div>

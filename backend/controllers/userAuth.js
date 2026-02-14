@@ -91,10 +91,12 @@ module.exports.signin = async (req, res) => {
         await addHoldingsForNewUser(data._id);
         await addWallet(data._id);
         await addwatchlistForNewUser(data._id);
-        await sendEmail(
-            data.email,
-            "Welcome to TRADENOW",
-            `Hi ${data.username},
+        // Account creation should succeed even if welcome email fails.
+        try {
+            await sendEmail(
+                data.email,
+                "Welcome to TRADENOW",
+                `Hi ${data.username},
 
                 Your TRADENOW account has been created successfully.
 
@@ -103,8 +105,12 @@ module.exports.signin = async (req, res) => {
                 If this wasn’t you, please ignore this email.
 
                 — Team TRADENOW`
-        );
-        return res.json({ success: true, message: "Sign in successfully" });
+            );
+        } catch (emailErr) {
+            console.log("Welcome email failed:", emailErr.message);
+        }
+
+        return res.json({ success: true, message: "Registered successfully" });
 
     } catch (err) {
         return res.json({ success: false, message: err.message });
